@@ -40,7 +40,7 @@
 
       <dg:DataGrid.Columns>
         <dg:DataGridTextColumn Header="№" Binding="{Binding Number}" Width="50"/>
-        <dg:DataGridTextColumn Header="Дисциплина / Итого" Binding="{Binding DisciplineName}" Width="320"/>
+        <dg:DataGridTextColumn Header="Дисциплина" Binding="{Binding DisciplineName}" Width="320"/>
         <dg:DataGridTextColumn Header="Группа / Поручено/Выполнено" Binding="{Binding FacultyGroup}" Width="210"/>
 
         <dg:DataGridTextColumn Header="Курс" Binding="{Binding Course}" Width="60"/>

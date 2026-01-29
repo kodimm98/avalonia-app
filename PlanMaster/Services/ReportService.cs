@@ -232,6 +232,14 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
 
         foreach (var t in tables.OrderBy(x => x.SheetName))
         {
+            var dataRows = t.Rows
+                .Where(r => !r.IsSummary)
+                .OrderBy(r => r.RowOrder)
+                .ToList();
+
+            if (dataRows.Count == 0)
+                continue;
+
             list.Add(TitleParagraph($"{t.SheetName} — {t.SemesterTitle}".Trim(' ', '—')));
 
             var table = NewTeachingTable();
@@ -278,7 +286,7 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
                 HeaderCell("", vMergeContinue: true)       // 25
             ));
 
-            foreach (var r in t.Rows.OrderBy(r => r.RowOrder))
+            foreach (var r in dataRows)
             {
                 table.AppendChild(Row(
                     CellText(r.Number?.ToString() ?? "", false, alignCenter: true),
@@ -366,20 +374,20 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
 
         if (t.Sem1Plan.HasValue || t.Sem1Fact.HasValue)
         {
-            Add("Итого за 1 семестр:", "Поручено", t.Sem1Plan);
-            Add("Итого за 1 семестр:", "Выполнено", t.Sem1Fact);
+            Add(string.Empty, "Поручено", t.Sem1Plan);
+            Add(string.Empty, "Выполнено", t.Sem1Fact);
         }
 
         if (t.Sem2Plan.HasValue || t.Sem2Fact.HasValue)
         {
-            Add("Итого за 2 семестр:", "Поручено", t.Sem2Plan);
-            Add("Итого за 2 семестр:", "Выполнено", t.Sem2Fact);
+            Add(string.Empty, "Поручено", t.Sem2Plan);
+            Add(string.Empty, "Выполнено", t.Sem2Fact);
         }
 
         if (t.YearPlan.HasValue || t.YearFact.HasValue)
         {
-            Add("Итого за год:", "Поручено", t.YearPlan);
-            Add("Итого за год:", "Выполнено", t.YearFact);
+            Add(string.Empty, "Поручено", t.YearPlan);
+            Add(string.Empty, "Выполнено", t.YearFact);
         }
     }
 
