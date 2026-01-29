@@ -1,0 +1,113 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:PlanMaster.Converters"
+             x:Class="PlanMaster.App">
+  <Application.Styles>
+    <FluentTheme />
+
+    <!-- DataGrid Fluent theme -->
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+
+    <!-- Resources -->
+    <Style>
+      <Style.Resources>
+        <!-- Core colors -->
+        <Color x:Key="TopBarColor">#1B1F26</Color>
+        <Color x:Key="HoverBlue">#4DA3FF</Color>
+
+        <SolidColorBrush x:Key="TopBarBrush" Color="{StaticResource TopBarColor}"/>
+        <SolidColorBrush x:Key="HoverBlueBrush" Color="{StaticResource HoverBlue}"/>
+
+        <SolidColorBrush x:Key="BgBrush" Color="#F6F7F9"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#E3E6EA"/>
+
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#8A93A3"/>
+
+        <!-- Converters -->
+        <conv:SheetNameRuConverter x:Key="SheetNameRu"/>
+        <conv:SummaryRowBackgroundConverter x:Key="SummaryBg"/>
+        <conv:SummaryRowFontWeightConverter x:Key="SummaryWeight"/>
+      </Style.Resources>
+    </Style>
+
+    <!-- Base text -->
+    <Style Selector="TextBlock">
+      <Setter Property="FontSize" Value="13"/>
+    </Style>
+
+    <!-- Buttons  -->
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="12,8"/>
+      <Setter Property="Background" Value="{StaticResource TopBarBrush}"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style Selector="Button:pointerover">
+      <Setter Property="Background" Value="{StaticResource HoverBlueBrush}"/>
+    </Style>
+
+    <!-- Cards -->
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{StaticResource CardBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="14"/>
+    </Style>
+
+    <!-- Top Menu -->
+    <Style Selector="Menu">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style Selector="MenuItem">
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Padding" Value="10,6"/>
+    </Style>
+
+    <Style Selector="MenuItem:pointerover">
+      <Setter Property="Background" Value="{StaticResource HoverBlueBrush}"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <!-- Submenu background -->
+    <Style Selector="MenuItem /template/ Popup Border">
+      <Setter Property="Background" Value="#222833"/>
+      <Setter Property="BorderBrush" Value="#2E3645"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+
+    <!-- Tabs: -->
+    <Style Selector="TabItem">
+      <Setter Property="FontSize" Value="16"/>
+      <Setter Property="Foreground" Value="#7A8394"/>
+      <Setter Property="Padding" Value="10,8"/>
+    </Style>
+
+    <Style Selector="TabItem:selected">
+      <Setter Property="Foreground" Value="#1B1F26"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <!-- ListBox -->
+    <Style Selector="ListBoxItem">
+      <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+
+    <Style Selector="ListBoxItem:pointerover /template/ Border">
+      <Setter Property="Background" Value="#EEF3FF"/>
+      <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+
+    <Style Selector="ListBoxItem:selected /template/ Border">
+      <Setter Property="Background" Value="#DCEBFF"/>
+      <Setter Property="BorderBrush" Value="#4DA3FF"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+
+  </Application.Styles>
+</Application>

@@ -1,0 +1,74 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+        xmlns:vm="clr-namespace:PlanMaster.ViewModels"
+        xmlns:conv="clr-namespace:PlanMaster.Converters"
+        x:Class="PlanMaster.Views.TableWindow"
+        x:DataType="vm:TableWindowViewModel"
+        Title="{Binding Title}"
+        Width="1400" Height="900">
+
+        <Window.Resources>
+            <conv:SummaryRowBackgroundConverter x:Key="SummaryBg"/>
+            <conv:SummaryRowFontWeightConverter x:Key="SummaryWeight"/>
+        </Window.Resources>
+
+  <Grid RowDefinitions="Auto,*">
+    <Border Background="#1B1F26" Padding="12">
+      <DockPanel LastChildFill="False">
+        <TextBlock Text="{Binding Title}" Foreground="White" FontSize="16" FontWeight="SemiBold"/>
+        <Button Content="Закрыть" DockPanel.Dock="Right" Click="Close_Click"/>
+      </DockPanel>
+    </Border>
+
+    <dg:DataGrid Grid.Row="1"
+                 ItemsSource="{Binding Rows}"
+                 AutoGenerateColumns="False"
+                 IsReadOnly="False"
+                 GridLinesVisibility="All"
+                 HorizontalScrollBarVisibility="Auto"
+                 VerticalScrollBarVisibility="Auto">
+
+<dg:DataGrid.Styles>
+  <Style Selector="dg|DataGridCell">
+    <Setter Property="Background"
+            Value="{ReflectionBinding IsSummary, Converter={StaticResource SummaryBg}}"/>
+    <Setter Property="FontWeight"
+            Value="{ReflectionBinding IsSummary, Converter={StaticResource SummaryWeight}}"/>
+  </Style>
+</dg:DataGrid.Styles>
+
+      <dg:DataGrid.Columns>
+        <dg:DataGridTextColumn Header="№" Binding="{Binding Number}" Width="50"/>
+        <dg:DataGridTextColumn Header="Дисциплина / Итого" Binding="{Binding DisciplineName}" Width="320"/>
+        <dg:DataGridTextColumn Header="Группа / Поручено/Выполнено" Binding="{Binding FacultyGroup}" Width="210"/>
+
+        <dg:DataGridTextColumn Header="Курс" Binding="{Binding Course}" Width="60"/>
+        <dg:DataGridTextColumn Header="Потоков" Binding="{Binding Streams}" Width="70"/>
+        <dg:DataGridTextColumn Header="Групп" Binding="{Binding Groups}" Width="70"/>
+        <dg:DataGridTextColumn Header="Студентов" Binding="{Binding Students}" Width="90"/>
+
+        <dg:DataGridTextColumn Header="Лек" Binding="{Binding Lek}" Width="60"/>
+        <dg:DataGridTextColumn Header="Пр" Binding="{Binding Pr}" Width="60"/>
+        <dg:DataGridTextColumn Header="Лаб" Binding="{Binding Lab}" Width="60"/>
+        <dg:DataGridTextColumn Header="КСР" Binding="{Binding Ksr}" Width="60"/>
+        <dg:DataGridTextColumn Header="КП" Binding="{Binding Kp}" Width="60"/>
+        <dg:DataGridTextColumn Header="КР" Binding="{Binding Kr}" Width="60"/>
+        <dg:DataGridTextColumn Header="КонтрРаб" Binding="{Binding KontrolRab}" Width="90"/>
+        <dg:DataGridTextColumn Header="Зач" Binding="{Binding Zach}" Width="60"/>
+        <dg:DataGridTextColumn Header="ДифЗач" Binding="{Binding DifZach}" Width="80"/>
+        <dg:DataGridTextColumn Header="Экз" Binding="{Binding Exz}" Width="60"/>
+        <dg:DataGridTextColumn Header="ГосЭкз" Binding="{Binding GosExz}" Width="80"/>
+        <dg:DataGridTextColumn Header="ГЭК" Binding="{Binding Gek}" Width="60"/>
+        <dg:DataGridTextColumn Header="РукВКР" Binding="{Binding RukVkr}" Width="80"/>
+        <dg:DataGridTextColumn Header="Рец" Binding="{Binding Rec}" Width="60"/>
+        <dg:DataGridTextColumn Header="УчПр" Binding="{Binding UchPr}" Width="70"/>
+        <dg:DataGridTextColumn Header="ПрПр" Binding="{Binding PrPr}" Width="70"/>
+        <dg:DataGridTextColumn Header="ПредПр" Binding="{Binding PredPr}" Width="80"/>
+
+        <dg:DataGridTextColumn Header="ВСЕГО" Binding="{Binding Total}" Width="80"/>
+        <dg:DataGridTextColumn Header="Примечание" Binding="{Binding Note}" Width="200"/>
+      </dg:DataGrid.Columns>
+    </dg:DataGrid>
+  </Grid>
+</Window>

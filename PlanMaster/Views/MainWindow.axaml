@@ -1,0 +1,355 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:PlanMaster.ViewModels"
+        xmlns:models="clr-namespace:PlanMaster.Models"
+        xmlns:dg="clr-namespace:Avalonia.Controls;assembly=Avalonia.Controls.DataGrid"
+        xmlns:conv="clr-namespace:PlanMaster.Converters"
+        mc:Ignorable="d"
+        x:Class="PlanMaster.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1280" Height="760"
+        MinWidth="1100" MinHeight="650"
+        Title="PlanMaster">
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+  <Window.Resources>
+    <conv:BoolToColumnWidthConverter x:Key="BoolToLeftWidth"/>
+    <conv:SheetNameRuConverter x:Key="SheetNameRu"/>
+    <conv:SummaryRowBackgroundConverter x:Key="SummaryBg"/>
+    <conv:SummaryRowFontWeightConverter x:Key="SummaryWeight"/>
+  </Window.Resources>
+
+    <Window.Styles>
+
+    <!-- Кнопка "Отчёт" в шапке -->
+    <Style Selector="DropDownButton.reportBtn">
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Background" Value="#26303D"/>
+      <Setter Property="Padding" Value="12,8"/>
+      <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+
+    <Style Selector="DropDownButton.reportBtn:pointerover">
+      <Setter Property="Background" Value="#2F89FF"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <!-- Выпадающее меню (только то, которое помечено классом reportFlyout) -->
+    <Style Selector="MenuFlyoutPresenter.reportFlyout">
+      <Setter Property="Background" Value="#1B1F26"/>
+      <Setter Property="BorderBrush" Value="#3c4552"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="Padding" Value="6"/>
+    </Style>
+
+    <Style Selector="MenuFlyoutPresenter.reportFlyout MenuItem">
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Padding" Value="12,8"/>
+    </Style>
+
+    <Style Selector="MenuFlyoutPresenter.reportFlyout MenuItem:pointerover">
+      <Setter Property="Background" Value="#2F89FF"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style Selector="MenuFlyoutPresenter.reportFlyout Separator">
+      <Setter Property="Background" Value="#2A3442"/>
+      <Setter Property="Margin" Value="6,4"/>
+    </Style>
+
+  </Window.Styles>
+
+
+  <Grid Background="#F6F7F9" RowDefinitions="Auto,*">
+
+    <!-- TOP BAR -->
+    <Border Background="#1B1F26" Padding="14,10">
+      <DockPanel LastChildFill="True">
+
+        <!-- left title -->
+        <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Spacing="2">
+          <TextBlock Text="PlanMaster" Foreground="White" FontSize="18" FontWeight="SemiBold"/>
+          <TextBlock Text="{Binding StatusText}" Foreground="#C9CED6" FontSize="12"/>
+        </StackPanel>
+
+        <!-- buttons row -->
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8">
+
+          <!-- ВАЖНО: Click — это обработчик (НЕ биндинг) -->
+          <Button Content="{Binding ToggleLeftTitle}" Click="ToggleLeft_Click"/>
+
+          <Button Content="Импорт Excel…" Click="ImportExcel_Click"/>
+          <Button Content="Загрузить из БД" Click="LoadDb_Click"/>
+          <Button Content="Сохранить" Click="SaveDb_Click"/>
+          <Button Content="Открыть в окне" Click="OpenInWindow_Click"/>
+
+          <!-- Report dropdown -->
+<!-- Report dropdown -->
+          <!-- Report dropdown -->
+          <DropDownButton Content="Отчёт"
+                          Classes="reportBtn">
+            <DropDownButton.Flyout>
+              <MenuFlyout>
+                <MenuFlyout.FlyoutPresenterClasses>
+                  <x:String>reportFlyout</x:String>
+                </MenuFlyout.FlyoutPresenterClasses>
+
+                <MenuItem Header="DOCX — сгенерировать" Click="ReportDocx_Click"/>
+                <MenuItem Header="DOCX — открыть" Click="OpenLastDocx_Click"/>
+                <MenuItem Header="DOCX — печать" Click="PrintLastDocx_Click"/>
+                <Separator/>
+                <MenuItem Header="PDF — сгенерировать" Click="ReportPdf_Click"/>
+                <MenuItem Header="PDF — просмотр" Click="OpenLastPdf_Click"/>
+                <MenuItem Header="PDF — печать" Click="PrintLastPdf_Click"/>
+              </MenuFlyout>
+            </DropDownButton.Flyout>
+          </DropDownButton>
+
+
+
+        </StackPanel>
+
+      </DockPanel>
+    </Border>
+
+    <!-- CONTENT -->
+    <Grid Grid.Row="1" Margin="12">
+
+      <!-- НЕЛЬЗЯ биндингом задавать ColumnDefinitions строкой.
+           Нужно задавать ColumnDefinition и биндингить Width. -->
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="{Binding IsLeftShown, Converter={StaticResource BoolToLeftWidth}}"/>
+        <ColumnDefinition Width="6"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- LEFT -->
+      <Border Grid.Column="0"
+              Padding="12"
+              CornerRadius="14"
+              Background="White"
+              BorderBrush="#E3E6EA"
+              BorderThickness="1"
+              IsVisible="{Binding IsLeftShown}">
+
+        <Grid RowDefinitions="Auto,*" RowSpacing="10">
+
+          <TextBlock Text="Листы / таблицы"
+                     FontWeight="SemiBold"
+                     FontSize="14"/>
+
+          <ListBox Grid.Row="1"
+                   ItemsSource="{Binding Tables}"
+                   SelectedItem="{Binding SelectedTable}">
+
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="models:PlanTable">
+                <Border Padding="10"
+                        CornerRadius="10"
+                        BorderBrush="#EEF0F3"
+                        BorderThickness="1"
+                        Background="Transparent">
+                  <StackPanel>
+                    <TextBlock Text="{Binding SheetName, Converter={StaticResource SheetNameRu}}"
+                               FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding SemesterTitle}"
+                               Opacity="0.65"
+                               FontSize="12"/>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+
+        </Grid>
+      </Border>
+
+      <!-- splitter -->
+      <GridSplitter Grid.Column="1"
+                    Width="6"
+                    Background="#E7EAF0"
+                    IsVisible="{Binding IsLeftShown}"/>
+
+      <!-- RIGHT -->
+      <Border Grid.Column="2"
+              Padding="12"
+              CornerRadius="14"
+              Background="White"
+              BorderBrush="#E3E6EA"
+              BorderThickness="1">
+
+        <TabControl>
+
+          <!-- 1) DISCIPLINES -->
+          <TabItem Header="Дисциплины (с итогами)">
+            <Grid RowDefinitions="Auto,*" RowSpacing="10">
+
+              <DockPanel Grid.Row="0" LastChildFill="True">
+                <TextBlock Text="{Binding SelectedTableTitle}"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           DockPanel.Dock="Left"/>
+
+                <TextBlock Text="Итоги внизу как в Excel: Итого → Поручено/Выполнено"
+                           DockPanel.Dock="Right"
+                           Opacity="0.6"/>
+              </DockPanel>
+
+              <dg:DataGrid Grid.Row="1"
+                           ItemsSource="{Binding CurrentRows}"
+                           AutoGenerateColumns="False"
+                           IsReadOnly="False"
+                           GridLinesVisibility="All"
+                           FontSize="12"
+                           RowHeight="26"
+                           ColumnHeaderHeight="30"
+                           HorizontalScrollBarVisibility="Auto"
+                           VerticalScrollBarVisibility="Auto">
+
+                <!-- Подсветка итоговых строк -->
+                <dg:DataGrid.Styles>
+                  <Style Selector="dg|DataGridCell">
+                    <Setter Property="Background"
+                            Value="{ReflectionBinding IsSummary, Converter={StaticResource SummaryBg}}"/>
+                    <Setter Property="FontWeight"
+                            Value="{ReflectionBinding IsSummary, Converter={StaticResource SummaryWeight}}"/>
+                  </Style>
+                </dg:DataGrid.Styles>
+
+                <dg:DataGrid.Columns>
+
+                  <!-- Базовые -->
+                  <dg:DataGridTextColumn Header="№" Binding="{Binding Number}" Width="50"/>
+                  <dg:DataGridTextColumn Header="Наименование дисциплины / Итого" Binding="{Binding DisciplineName}" Width="320"/>
+                  <dg:DataGridTextColumn Header="Факультет, спец., группа / Поручено/Вып." Binding="{Binding FacultyGroup}" Width="240"/>
+
+                  <!-- Количество -->
+                  <dg:DataGridTextColumn Header="Курс" Binding="{Binding Course}" Width="60"/>
+                  <dg:DataGridTextColumn Header="Потоков" Binding="{Binding Streams}" Width="75"/>
+                  <dg:DataGridTextColumn Header="Групп" Binding="{Binding Groups}" Width="70"/>
+                  <dg:DataGridTextColumn Header="Студентов" Binding="{Binding Students}" Width="95"/>
+
+                  <!-- Часы -->
+                  <dg:DataGridTextColumn Header="Лекции" Binding="{Binding Lek}" Width="70"/>
+                  <dg:DataGridTextColumn Header="Практика" Binding="{Binding Pr}" Width="70"/>
+                  <dg:DataGridTextColumn Header="Лаб." Binding="{Binding Lab}" Width="60"/>
+                  <dg:DataGridTextColumn Header="КСР" Binding="{Binding Ksr}" Width="60"/>
+                  <dg:DataGridTextColumn Header="КП" Binding="{Binding Kp}" Width="60"/>
+                  <dg:DataGridTextColumn Header="КР" Binding="{Binding Kr}" Width="60"/>
+                  <dg:DataGridTextColumn Header="Контр. раб." Binding="{Binding KontrolRab}" Width="90"/>
+                  <dg:DataGridTextColumn Header="Зач." Binding="{Binding Zach}" Width="60"/>
+                  <dg:DataGridTextColumn Header="Диф. зач." Binding="{Binding DifZach}" Width="80"/>
+                  <dg:DataGridTextColumn Header="Экз." Binding="{Binding Exz}" Width="60"/>
+                  <dg:DataGridTextColumn Header="Гос. экз." Binding="{Binding GosExz}" Width="80"/>
+                  <dg:DataGridTextColumn Header="ГЭК" Binding="{Binding Gek}" Width="60"/>
+                  <dg:DataGridTextColumn Header="Рук. ВКР" Binding="{Binding RukVkr}" Width="80"/>
+                  <dg:DataGridTextColumn Header="Рец." Binding="{Binding Rec}" Width="60"/>
+                  <dg:DataGridTextColumn Header="Уч. практ." Binding="{Binding UchPr}" Width="80"/>
+                  <dg:DataGridTextColumn Header="Произв. практ." Binding="{Binding PrPr}" Width="95"/>
+                  <dg:DataGridTextColumn Header="Предд. практ." Binding="{Binding PredPr}" Width="95"/>
+
+                  <dg:DataGridTextColumn Header="ВСЕГО" Binding="{Binding Total}" Width="80"/>
+                  <dg:DataGridTextColumn Header="Примечание" Binding="{Binding Note}" Width="200"/>
+
+                </dg:DataGrid.Columns>
+              </dg:DataGrid>
+
+            </Grid>
+          </TabItem>
+
+          <!-- 2) SUMMARY -->
+          <TabItem Header="Итоговая таблица (для отчёта)">
+            <dg:DataGrid ItemsSource="{Binding SummaryRows}"
+                         AutoGenerateColumns="False"
+                         IsReadOnly="False"
+                         GridLinesVisibility="All"
+                         HorizontalScrollBarVisibility="Auto"
+                         VerticalScrollBarVisibility="Auto">
+              <dg:DataGrid.Columns>
+                <dg:DataGridTextColumn Header="№" Binding="{Binding Code}" Width="70"/>
+                <dg:DataGridTextColumn Header="Виды работ" Binding="{Binding WorkName}" Width="*"/>
+                <dg:DataGridTextColumn Header="1 семестр план" Binding="{Binding Sem1Plan}" Width="120"/>
+                <dg:DataGridTextColumn Header="1 семестр факт" Binding="{Binding Sem1Fact}" Width="120"/>
+                <dg:DataGridTextColumn Header="2 семестр план" Binding="{Binding Sem2Plan}" Width="120"/>
+                <dg:DataGridTextColumn Header="2 семестр факт" Binding="{Binding Sem2Fact}" Width="120"/>
+                <dg:DataGridTextColumn Header="год план" Binding="{Binding YearPlan}" Width="100"/>
+                <dg:DataGridTextColumn Header="год факт" Binding="{Binding YearFact}" Width="100"/>
+              </dg:DataGrid.Columns>
+            </dg:DataGrid>
+          </TabItem>
+
+          <!-- 3) PLANS -->
+          <TabItem Header="Планы">
+            <Grid ColumnDefinitions="320,*"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="10"
+                  ColumnSpacing="10">
+
+              <StackPanel Grid.ColumnSpan="2"
+                          Orientation="Horizontal"
+                          Spacing="8">
+                <TextBlock Text="Название:"
+                           VerticalAlignment="Center"
+                           Opacity="0.7"/>
+                <TextBox Width="360"
+                         Text="{Binding PlanName}"/>
+                <Button Content="Сохранить как новый план"
+                        Click="SaveAsNewPlan_Click"/>
+                <Button Content="Сохранить изменения"
+                        Click="SaveCurrentPlan_Click"
+                        IsEnabled="{Binding CanSaveCurrentPlan}"/>
+                <Button Content="Обновить список"
+                        Click="RefreshPlans_Click"/>
+                <Button Content="Удалить план"
+                        Click="DeletePlan_Click"/>
+              </StackPanel>
+
+              <ListBox Grid.Row="1"
+                       Grid.Column="0"
+                       ItemsSource="{Binding Plans}"
+                       SelectedItem="{Binding SelectedPlan}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Margin="6">
+                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                      <TextBlock Text="{Binding UpdatedAtUtc}" Opacity="0.6" FontSize="12"/>
+                    </StackPanel>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+
+              <Border Grid.Row="1"
+                      Grid.Column="1"
+                      Padding="12"
+                      Background="#FAFAFB"
+                      BorderBrush="#E3E6EA"
+                      BorderThickness="1">
+                <StackPanel Spacing="8">
+                  <TextBlock Text="Открытие плана"
+                             FontWeight="SemiBold"/>
+                  <TextBlock Text="Выберите план слева и нажмите 'Открыть'."
+                             Opacity="0.7"/>
+                  <Button Content="Открыть выбранный план"
+                          Click="OpenPlan_Click"
+                          Width="220"/>
+                  <TextBlock Text="После открытия редактируйте таблицы во вкладках 'Дисциплины/Итоги' и сохраняйте здесь."
+                             Opacity="0.7"/>
+                </StackPanel>
+              </Border>
+
+            </Grid>
+          </TabItem>
+
+        </TabControl>
+
+      </Border>
+    </Grid>
+  </Grid>
+</Window>
