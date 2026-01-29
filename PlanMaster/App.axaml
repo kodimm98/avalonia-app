@@ -81,8 +81,8 @@
     </Style>
 
     <Style Selector="MenuItem:pointerover">
-      <Setter Property="Background" Value="{StaticResource HoverBlueBrush}"/>
-      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+      <Setter Property="Background" Value="#E6E8EC"/>
+      <Setter Property="Foreground" Value="#1E2430"/>
     </Style>
 
     <!-- Submenu background -->
@@ -111,15 +111,36 @@
     </Style>
 
     <Style Selector="ListBoxItem:pointerover /template/ Border">
-      <Setter Property="Background" Value="{StaticResource HoverBlueBrush}"/>
+      <Setter Property="Background" Value="#E6E8EC"/>
       <Setter Property="CornerRadius" Value="10"/>
     </Style>
 
     <Style Selector="ListBoxItem:selected /template/ Border">
-      <Setter Property="Background" Value="#DCEBFF"/>
-      <Setter Property="BorderBrush" Value="#4DA3FF"/>
+      <Setter Property="Background" Value="{StaticResource TopBarBrush}"/>
+      <Setter Property="BorderBrush" Value="{StaticResource TopBarBrush}"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+
+    <Style Selector="ListBoxItem:selected TextBlock">
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style Selector="TextBox">
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="BorderBrush" Value="{StaticResource SurfaceBorderBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="TextBox:pointerover">
+      <Setter Property="BorderBrush" Value="#B8C6DA"/>
+    </Style>
+
+    <Style Selector="TextBox:focus">
+      <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}"/>
     </Style>
 
     <Style Selector="TextBox">

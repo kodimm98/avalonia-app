@@ -57,7 +57,7 @@
     </Style>
 
     <Style Selector="MenuFlyoutPresenter.reportFlyout MenuItem:pointerover">
-      <Setter Property="Background" Value="#E8F1FF"/>
+      <Setter Property="Background" Value="#E6E8EC"/>
       <Setter Property="Foreground" Value="#1E2430"/>
     </Style>
 
