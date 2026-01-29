@@ -124,4 +124,17 @@ private void ToggleLeft_Click(object? sender, Avalonia.Interactivity.RoutedEvent
 
         w.Show();
     }
+
+    private void PlansMenu_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm) return;
+
+        var window = new PlansWindow
+        {
+            DataContext = vm,
+            Owner = this
+        };
+
+        window.Show();
+    }
 }

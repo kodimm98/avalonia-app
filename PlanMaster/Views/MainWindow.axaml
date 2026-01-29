@@ -69,7 +69,7 @@
   </Window.Styles>
 
 
-  <Grid Background="#DCDCDC" RowDefinitions="Auto,*">
+  <Grid Background="#DCDCDC" RowDefinitions="Auto,Auto,*">
 
     <!-- TOP BAR -->
     <Border Background="#E6E6E6" Padding="10,8">
@@ -81,48 +81,41 @@
           <TextBlock Text="{Binding StatusText}" Foreground="#5A5A5A" FontSize="12"/>
         </StackPanel>
 
-        <!-- buttons row -->
-        <WrapPanel DockPanel.Dock="Right" Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
-
-          <!-- ВАЖНО: Click — это обработчик (НЕ биндинг) -->
-          <Button Content="{Binding ToggleLeftTitle}" Click="ToggleLeft_Click"/>
-
-          <Button Content="Импорт Excel…" Click="ImportExcel_Click"/>
-          <Button Content="Загрузить из БД" Click="LoadDb_Click"/>
-          <Button Content="Сохранить" Click="SaveDb_Click"/>
-          <Button Content="Открыть в окне" Click="OpenInWindow_Click"/>
-
-          <!-- Report dropdown -->
-<!-- Report dropdown -->
-          <!-- Report dropdown -->
-          <DropDownButton Content="Отчёт"
-                          Classes="reportBtn">
-            <DropDownButton.Flyout>
-              <MenuFlyout>
-                <MenuFlyout.FlyoutPresenterClasses>
-                  <x:String>reportFlyout</x:String>
-                </MenuFlyout.FlyoutPresenterClasses>
-
-                <MenuItem Header="DOCX — сгенерировать" Click="ReportDocx_Click"/>
-                <MenuItem Header="DOCX — открыть" Click="OpenLastDocx_Click"/>
-                <MenuItem Header="DOCX — печать" Click="PrintLastDocx_Click"/>
-                <Separator/>
-                <MenuItem Header="PDF — сгенерировать" Click="ReportPdf_Click"/>
-                <MenuItem Header="PDF — просмотр" Click="OpenLastPdf_Click"/>
-                <MenuItem Header="PDF — печать" Click="PrintLastPdf_Click"/>
-              </MenuFlyout>
-            </DropDownButton.Flyout>
-          </DropDownButton>
-
-
-
-        </WrapPanel>
-
       </DockPanel>
     </Border>
 
+    <Border Grid.Row="1" Background="#F3F3F3" BorderBrush="#BFC3C8" BorderThickness="0,0,0,1" Padding="10,6">
+      <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+        <Button Content="Планы" Click="PlansMenu_Click"/>
+        <Button Content="{Binding ToggleLeftTitle}" Click="ToggleLeft_Click"/>
+        <Button Content="Импорт Excel…" Click="ImportExcel_Click"/>
+        <Button Content="Загрузить из БД" Click="LoadDb_Click"/>
+        <Button Content="Сохранить" Click="SaveDb_Click"/>
+        <Button Content="Открыть в окне" Click="OpenInWindow_Click"/>
+
+        <DropDownButton Content="Отчёт"
+                        Classes="reportBtn">
+          <DropDownButton.Flyout>
+            <MenuFlyout>
+              <MenuFlyout.FlyoutPresenterClasses>
+                <x:String>reportFlyout</x:String>
+              </MenuFlyout.FlyoutPresenterClasses>
+
+              <MenuItem Header="DOCX — сгенерировать" Click="ReportDocx_Click"/>
+              <MenuItem Header="DOCX — открыть" Click="OpenLastDocx_Click"/>
+              <MenuItem Header="DOCX — печать" Click="PrintLastDocx_Click"/>
+              <Separator/>
+              <MenuItem Header="PDF — сгенерировать" Click="ReportPdf_Click"/>
+              <MenuItem Header="PDF — просмотр" Click="OpenLastPdf_Click"/>
+              <MenuItem Header="PDF — печать" Click="PrintLastPdf_Click"/>
+            </MenuFlyout>
+          </DropDownButton.Flyout>
+        </DropDownButton>
+      </WrapPanel>
+    </Border>
+
     <!-- CONTENT -->
-    <Grid Grid.Row="1" Margin="12">
+    <Grid Grid.Row="2" Margin="12">
 
       <!-- НЕЛЬЗЯ биндингом задавать ColumnDefinitions строкой.
            Нужно задавать ColumnDefinition и биндингить Width. -->
@@ -283,68 +276,6 @@
                 <dg:DataGridTextColumn Header="год факт" Binding="{Binding YearFact}" Width="100"/>
               </dg:DataGrid.Columns>
             </dg:DataGrid>
-          </TabItem>
-
-          <!-- 3) PLANS -->
-          <TabItem Header="Планы">
-            <Grid ColumnDefinitions="320,*"
-                  RowDefinitions="Auto,*"
-                  RowSpacing="10"
-                  ColumnSpacing="10">
-
-              <StackPanel Grid.ColumnSpan="2"
-                          Orientation="Horizontal"
-                          Spacing="8">
-                <TextBlock Text="Название:"
-                           VerticalAlignment="Center"
-                           Opacity="0.7"/>
-                <TextBox Width="360"
-                         Text="{Binding PlanName}"/>
-                <Button Content="Сохранить как новый план"
-                        Click="SaveAsNewPlan_Click"/>
-                <Button Content="Сохранить изменения"
-                        Click="SaveCurrentPlan_Click"
-                        IsEnabled="{Binding CanSaveCurrentPlan}"/>
-                <Button Content="Обновить список"
-                        Click="RefreshPlans_Click"/>
-                <Button Content="Удалить план"
-                        Click="DeletePlan_Click"/>
-              </StackPanel>
-
-              <ListBox Grid.Row="1"
-                       Grid.Column="0"
-                       ItemsSource="{Binding Plans}"
-                       SelectedItem="{Binding SelectedPlan}">
-                <ListBox.ItemTemplate>
-                  <DataTemplate>
-                    <StackPanel Margin="6">
-                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-                      <TextBlock Text="{Binding UpdatedAtUtc}" Opacity="0.6" FontSize="12"/>
-                    </StackPanel>
-                  </DataTemplate>
-                </ListBox.ItemTemplate>
-              </ListBox>
-
-              <Border Grid.Row="1"
-                      Grid.Column="1"
-                      Padding="12"
-                      Background="#FAFAFB"
-                      BorderBrush="#E3E6EA"
-                      BorderThickness="1">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="Открытие плана"
-                             FontWeight="SemiBold"/>
-                  <TextBlock Text="Выберите план слева и нажмите 'Открыть'."
-                             Opacity="0.7"/>
-                  <Button Content="Открыть выбранный план"
-                          Click="OpenPlan_Click"
-                          Width="220"/>
-                  <TextBlock Text="После открытия редактируйте таблицы во вкладках 'Учебная нагрузка/Итоговая таблица' и сохраняйте здесь."
-                             Opacity="0.7"/>
-                </StackPanel>
-              </Border>
-
-            </Grid>
           </TabItem>
 
         </TabControl>
