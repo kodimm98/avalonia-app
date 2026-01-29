@@ -143,5 +143,39 @@
       <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}"/>
     </Style>
 
+    <Style Selector="TextBox">
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="BorderBrush" Value="{StaticResource SurfaceBorderBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="TextBox:pointerover">
+      <Setter Property="BorderBrush" Value="#B8C6DA"/>
+    </Style>
+
+    <Style Selector="TextBox:focus">
+      <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}"/>
+    </Style>
+
+    <Style Selector="TextBox">
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="BorderBrush" Value="{StaticResource SurfaceBorderBrush}"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="TextBox:pointerover">
+      <Setter Property="BorderBrush" Value="#B8C6DA"/>
+    </Style>
+
+    <Style Selector="TextBox:focus">
+      <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}"/>
+    </Style>
+
   </Application.Styles>
 </Application>
