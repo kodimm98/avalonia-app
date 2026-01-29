@@ -14,9 +14,9 @@
         </Window.Resources>
 
   <Grid RowDefinitions="Auto,*">
-    <Border Background="#1B1F26" Padding="12">
+    <Border Background="#E6E6E6" Padding="10">
       <DockPanel LastChildFill="False">
-        <TextBlock Text="{Binding Title}" Foreground="White" FontSize="16" FontWeight="SemiBold"/>
+        <TextBlock Text="{Binding Title}" Foreground="#1A1A1A" FontSize="16" FontWeight="SemiBold"/>
         <Button Content="Закрыть" DockPanel.Dock="Right" Click="Close_Click"/>
       </DockPanel>
     </Border>

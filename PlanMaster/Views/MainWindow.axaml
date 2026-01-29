@@ -28,37 +28,37 @@
 
     <!-- Кнопка "Отчёт" в шапке -->
     <Style Selector="DropDownButton.reportBtn">
-      <Setter Property="Foreground" Value="#1E2430"/>
-      <Setter Property="Background" Value="#FFFFFF"/>
-      <Setter Property="Padding" Value="12,7"/>
-      <Setter Property="CornerRadius" Value="6"/>
-      <Setter Property="BorderBrush" Value="#D6DEE9"/>
+      <Setter Property="Foreground" Value="#1A1A1A"/>
+      <Setter Property="Background" Value="#F0F0F0"/>
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="CornerRadius" Value="2"/>
+      <Setter Property="BorderBrush" Value="#C0C0C0"/>
       <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
     <Style Selector="DropDownButton.reportBtn:pointerover">
-      <Setter Property="Background" Value="#E8F1FF"/>
-      <Setter Property="Foreground" Value="#1E2430"/>
+      <Setter Property="Background" Value="#E5E5E5"/>
+      <Setter Property="Foreground" Value="#1A1A1A"/>
     </Style>
 
     <!-- Выпадающее меню (только то, которое помечено классом reportFlyout) -->
     <Style Selector="MenuFlyoutPresenter.reportFlyout">
       <Setter Property="Background" Value="#FFFFFF"/>
-      <Setter Property="BorderBrush" Value="#D6DEE9"/>
+      <Setter Property="BorderBrush" Value="#BFC3C8"/>
       <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="CornerRadius" Value="2"/>
       <Setter Property="Padding" Value="6"/>
     </Style>
 
     <Style Selector="MenuFlyoutPresenter.reportFlyout MenuItem">
-      <Setter Property="Foreground" Value="#1E2430"/>
+      <Setter Property="Foreground" Value="#1A1A1A"/>
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="Padding" Value="12,8"/>
     </Style>
 
     <Style Selector="MenuFlyoutPresenter.reportFlyout MenuItem:pointerover">
       <Setter Property="Background" Value="#E6E8EC"/>
-      <Setter Property="Foreground" Value="#1E2430"/>
+      <Setter Property="Foreground" Value="#1A1A1A"/>
     </Style>
 
     <Style Selector="MenuFlyoutPresenter.reportFlyout Separator">
@@ -69,16 +69,16 @@
   </Window.Styles>
 
 
-  <Grid Background="#F2F5FA" RowDefinitions="Auto,*">
+  <Grid Background="#DCDCDC" RowDefinitions="Auto,*">
 
     <!-- TOP BAR -->
-    <Border Background="#263142" Padding="16,12">
+    <Border Background="#E6E6E6" Padding="10,8">
       <DockPanel LastChildFill="True">
 
         <!-- left title -->
         <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Spacing="2">
-          <TextBlock Text="PlanMaster" Foreground="White" FontSize="18" FontWeight="SemiBold"/>
-          <TextBlock Text="{Binding StatusText}" Foreground="#C9D2E0" FontSize="12"/>
+          <TextBlock Text="PlanMaster" Foreground="#1A1A1A" FontSize="18" FontWeight="SemiBold"/>
+          <TextBlock Text="{Binding StatusText}" Foreground="#5A5A5A" FontSize="12"/>
         </StackPanel>
 
         <!-- buttons row -->
@@ -135,9 +135,9 @@
       <!-- LEFT -->
       <Border Grid.Column="0"
               Padding="12"
-              CornerRadius="12"
+              CornerRadius="2"
               Background="White"
-              BorderBrush="#D6DEE9"
+              BorderBrush="#BFC3C8"
               BorderThickness="1"
               IsVisible="{Binding IsLeftShown}">
 
@@ -154,8 +154,8 @@
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="models:PlanTable">
                 <Border Padding="10"
-                        CornerRadius="10"
-                        BorderBrush="#EEF0F3"
+                        CornerRadius="2"
+                        BorderBrush="#D5D5D5"
                         BorderThickness="1"
                         Background="Transparent">
                   <StackPanel>
@@ -176,15 +176,15 @@
       <!-- splitter -->
       <GridSplitter Grid.Column="1"
                     Width="6"
-                    Background="#E5EAF2"
+                    Background="#CFCFCF"
                     IsVisible="{Binding IsLeftShown}"/>
 
       <!-- RIGHT -->
       <Border Grid.Column="2"
               Padding="12"
-              CornerRadius="12"
+              CornerRadius="2"
               Background="White"
-              BorderBrush="#D6DEE9"
+              BorderBrush="#BFC3C8"
               BorderThickness="1">
 
         <TabControl>
