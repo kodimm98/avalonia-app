@@ -131,10 +131,9 @@ private void ToggleLeft_Click(object? sender, Avalonia.Interactivity.RoutedEvent
 
         var window = new PlansWindow
         {
-            DataContext = vm,
-            Owner = this
+            DataContext = vm
         };
 
-        window.Show();
+        window.Show(this);
     }
 }
