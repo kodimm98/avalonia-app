@@ -231,44 +231,61 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
 
         foreach (var t in tables.OrderBy(x => x.SheetName))
         {
+            var dataRows = t.Rows
+                .Where(r => !r.IsSummary)
+                .OrderBy(r => r.RowOrder)
+                .ToList();
+
+            if (dataRows.Count == 0)
+                continue;
+
             list.Add(TitleParagraph($"{t.SheetName} — {t.SemesterTitle}".Trim(' ', '—')));
 
             var table = NewTeachingTable();
 
             // 25 колонок (как TableGrid ниже)
-            table.AppendChild(Row(
-                CellLines(true, "№", "п.п."),                    // 1
-                CellLines(true, "Наименование", "дисциплины"),   // 2
-                CellLines(true, "Факультет,", "спец., группа"),  // 3
-
-                CellLines(true, "Кол-во", "курс"),               // 4
-                CellLines(true, "Кол-во", "потоков"),            // 5
-                CellLines(true, "Кол-во", "групп"),              // 6
-                CellLines(true, "Кол-во", "студентов"),          // 7
-
-                CellLines(true, "лекц.", ""),                    // 8
-                CellLines(true, "практ.", ""),                   // 9
-                CellLines(true, "лаб.", ""),                     // 10
-                CellLines(true, "КСР", ""),                      // 11
-                CellLines(true, "КП", ""),                       // 12
-                CellLines(true, "КР", ""),                       // 13
-                CellLines(true, "контр.", "раб."),               // 14
-                CellLines(true, "зач.", ""),                     // 15
-                CellLines(true, "диф.", "зач."),                 // 16
-                CellLines(true, "экз.", ""),                     // 17
-                CellLines(true, "гос.", "экз."),                 // 18
-                CellLines(true, "ГЭК", ""),                      // 19
-                CellLines(true, "рук.", "ВКР"),                  // 20
-
-                CellLines(true, "уч.", "практ."),                // 21
-                CellLines(true, "произв.", "практ."),            // 22
-                CellLines(true, "предд.", "практ."),             // 23
-
-                CellLines(true, "ВСЕ", "ГО"),                    // 24
-                CellLines(true, "Примеч.", "")                   // 25
+            table.AppendChild(RowWithHeight(420,
+                HeaderCell("№\nп.п.", vMergeRestart: true),                    // 1
+                HeaderCell("Наименование\nдисциплины", vMergeRestart: true),   // 2
+                HeaderCell("Факультет,\nспециальность,\nгруппа", vMergeRestart: true), // 3
+                HeaderCell("Количество", gridSpan: 4),                         // 4-7
+                HeaderCell("Количество часов по видам", gridSpan: 16),         // 8-23
+                HeaderCell("Всего", vertical: true, vMergeRestart: true),      // 24
+                HeaderCell("Примеч.", vertical: true, vMergeRestart: true)     // 25
             ));
 
-            foreach (var r in t.Rows.OrderBy(r => r.RowOrder))
+            table.AppendChild(RowWithHeight(680,
+                HeaderCell("", vMergeContinue: true), // 1
+                HeaderCell("", vMergeContinue: true), // 2
+                HeaderCell("", vMergeContinue: true), // 3
+
+                HeaderCell("курс", vertical: true),        // 4
+                HeaderCell("потоков", vertical: true),     // 5
+                HeaderCell("групп", vertical: true),       // 6
+                HeaderCell("студентов", vertical: true),   // 7
+
+                HeaderCell("лекц.", vertical: true),       // 8
+                HeaderCell("практ.", vertical: true),      // 9
+                HeaderCell("лаб.", vertical: true),        // 10
+                HeaderCell("КСР", vertical: true),         // 11
+                HeaderCell("КП", vertical: true),          // 12
+                HeaderCell("КР", vertical: true),          // 13
+                HeaderCell("контр.\nраб.", vertical: true),// 14
+                HeaderCell("зач.", vertical: true),        // 15
+                HeaderCell("диф.\nзач.", vertical: true),  // 16
+                HeaderCell("экз.", vertical: true),        // 17
+                HeaderCell("гос.\nэкз.", vertical: true),  // 18
+                HeaderCell("ГЭК", vertical: true),         // 19
+                HeaderCell("рук.\nВКР", vertical: true),    // 20
+                HeaderCell("уч.\nпракт.", vertical: true),  // 21
+                HeaderCell("произв.\nпракт.", vertical: true), // 22
+                HeaderCell("предд.\nпракт.", vertical: true),  // 23
+
+                HeaderCell("", vMergeContinue: true),      // 24
+                HeaderCell("", vMergeContinue: true)       // 25
+            ));
+
+            foreach (var r in dataRows)
             {
                 table.AppendChild(Row(
                     CellText(r.Number?.ToString() ?? "", false, alignCenter: true),
@@ -356,20 +373,20 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
 
         if (t.Sem1Plan.HasValue || t.Sem1Fact.HasValue)
         {
-            Add("Итого за 1 семестр:", "Поручено", t.Sem1Plan);
-            Add("Итого за 1 семестр:", "Выполнено", t.Sem1Fact);
+            Add(string.Empty, "Поручено", t.Sem1Plan);
+            Add(string.Empty, "Выполнено", t.Sem1Fact);
         }
 
         if (t.Sem2Plan.HasValue || t.Sem2Fact.HasValue)
         {
-            Add("Итого за 2 семестр:", "Поручено", t.Sem2Plan);
-            Add("Итого за 2 семестр:", "Выполнено", t.Sem2Fact);
+            Add(string.Empty, "Поручено", t.Sem2Plan);
+            Add(string.Empty, "Выполнено", t.Sem2Fact);
         }
 
         if (t.YearPlan.HasValue || t.YearFact.HasValue)
         {
-            Add("Итого за год:", "Поручено", t.YearPlan);
-            Add("Итого за год:", "Выполнено", t.YearFact);
+            Add(string.Empty, "Поручено", t.YearPlan);
+            Add(string.Empty, "Выполнено", t.YearFact);
         }
     }
 
@@ -377,15 +394,23 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
     {
         var table = NewSummaryTable();
 
-        table.AppendChild(Row(
-            CellLines(true, "№", "п.п."),
-            CellLines(true, "Виды работ", "(в часах)"),
-            CellLines(true, "1 семестр", "план"),
-            CellLines(true, "1 семестр", "факт"),
-            CellLines(true, "2 семестр", "план"),
-            CellLines(true, "2 семестр", "факт"),
-            CellLines(true, "На год", "план"),
-            CellLines(true, "На год", "факт")
+        table.AppendChild(RowWithHeight(420,
+            HeaderCell("№\nп.п.", vMergeRestart: true),
+            HeaderCell("Виды работ\n(в часах)", vMergeRestart: true),
+            HeaderCell("1 семестр", gridSpan: 2),
+            HeaderCell("2 семестр", gridSpan: 2),
+            HeaderCell("На год", gridSpan: 2)
+        ));
+
+        table.AppendChild(RowWithHeight(360,
+            HeaderCell("", vMergeContinue: true),
+            HeaderCell("", vMergeContinue: true),
+            HeaderCell("план"),
+            HeaderCell("факт"),
+            HeaderCell("план"),
+            HeaderCell("факт"),
+            HeaderCell("план"),
+            HeaderCell("факт")
         ));
 
         foreach (var r in rows.OrderBy(r => r.RowOrder))
@@ -515,6 +540,14 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         return r;
     }
 
+    private static TableRow RowWithHeight(int height, params TableCell[] cells)
+    {
+        var row = Row(cells);
+        row.PrependChild(new TableRowProperties(
+            new TableRowHeight { Val = (uint)height, HeightType = HeightRuleValues.AtLeast }));
+        return row;
+    }
+
     private static TableCell CellText(
         string text,
         bool bold,
@@ -546,31 +579,45 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         return new TableCell(tcProps, para);
     }
 
-    private static TableCell CellLines(bool bold, string line1, string line2)
+    private static TableCell HeaderCell(
+        string text,
+        int gridSpan = 1,
+        bool vertical = false,
+        bool vMergeRestart = false,
+        bool vMergeContinue = false)
     {
         var tcProps = new TableCellProperties(
             new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Center }
         );
+
+        if (gridSpan > 1)
+            tcProps.AppendChild(new GridSpan { Val = gridSpan });
+
+        if (vMergeRestart)
+            tcProps.AppendChild(new VerticalMerge { Val = MergedCellValues.Restart });
+        else if (vMergeContinue)
+            tcProps.AppendChild(new VerticalMerge { Val = MergedCellValues.Continue });
+
+        if (vertical)
+            tcProps.AppendChild(new TextDirection { Val = TextDirectionValues.BottomToTopLeftToRight });
 
         var pPr = new ParagraphProperties(
             new Justification { Val = JustificationValues.Center },
             new SpacingBetweenLines { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto }
         );
 
-        var runProps = new RunProperties(new FontSize { Val = FontSizeHeader });
-        if (bold) runProps.Append(new Bold());
-
+        var runProps = new RunProperties(new FontSize { Val = FontSizeHeader }, new Bold());
         var run = new Run(runProps);
-        run.Append(new Text(line1) { Space = SpaceProcessingModeValues.Preserve });
 
-        if (!string.IsNullOrWhiteSpace(line2))
+        var lines = text.Split('\n', StringSplitOptions.None);
+        for (var i = 0; i < lines.Length; i++)
         {
-            run.Append(new Break());
-            run.Append(new Text(line2) { Space = SpaceProcessingModeValues.Preserve });
+            if (i > 0)
+                run.Append(new Break());
+            run.Append(new Text(lines[i]) { Space = SpaceProcessingModeValues.Preserve });
         }
 
         var para = new Paragraph(pPr, run);
-
         return new TableCell(tcProps, para);
     }
 }
