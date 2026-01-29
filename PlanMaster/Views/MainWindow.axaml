@@ -82,7 +82,7 @@
         </StackPanel>
 
         <!-- buttons row -->
-        <WrapPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8">
+        <WrapPanel DockPanel.Dock="Right" Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
 
           <!-- ВАЖНО: Click — это обработчик (НЕ биндинг) -->
           <Button Content="{Binding ToggleLeftTitle}" Click="ToggleLeft_Click"/>
