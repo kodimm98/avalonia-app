@@ -296,6 +296,15 @@ public partial class MainWindowViewModel : ViewModelBase
         StatusText = "План удалён";
     }
 
+    public void AddMethodicalProcessRow()
+        => MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
+
+    public void AddMethodicalPublishingRow()
+        => MethodicalPublishingRows.Add(new MethodWorkRow { Category = MethodicalPublishingCategory });
+
+    public void AddMethodicalBaseRow()
+        => MethodicalBaseRows.Add(new MethodWorkRow { Category = MethodicalBaseCategory });
+
     private void ResetMethodicalRows()
     {
         MethodicalProcessRows.Clear();
