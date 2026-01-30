@@ -18,6 +18,10 @@ public class PlanDbContext : DbContext
     public DbSet<SummaryTable> SummaryTables => Set<SummaryTable>();
     public DbSet<SummaryRow> SummaryRows => Set<SummaryRow>();
 
+    // Учебно-методическая нагрузка
+    public DbSet<MethodWorkTable> MethodWorkTables => Set<MethodWorkTable>();
+    public DbSet<MethodWorkRow> MethodWorkRows => Set<MethodWorkRow>();
+
     public PlanDbContext(string dbPath)
     {
         _dbPath = dbPath;
@@ -43,6 +47,12 @@ public class PlanDbContext : DbContext
             .HasForeignKey<SummaryTable>(s => s.PlanId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<Plan>()
+            .HasOne<MethodWorkTable>()
+            .WithOne()
+            .HasForeignKey<MethodWorkTable>(t => t.PlanId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<PlanTable>()
             .HasMany(t => t.Rows)
             .WithOne(r => r.PlanTable!)
@@ -55,10 +65,19 @@ public class PlanDbContext : DbContext
             .HasForeignKey(r => r.SummaryTableId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<MethodWorkTable>()
+            .HasMany(t => t.Rows)
+            .WithOne(r => r.MethodWorkTable!)
+            .HasForeignKey(r => r.MethodWorkTableId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<PlanRow>()
             .HasIndex(r => new { r.PlanTableId, r.RowOrder });
 
         modelBuilder.Entity<SummaryRow>()
             .HasIndex(r => new { r.SummaryTableId, r.RowOrder });
+
+        modelBuilder.Entity<MethodWorkRow>()
+            .HasIndex(r => new { r.MethodWorkTableId, r.RowOrder });
     }
 }

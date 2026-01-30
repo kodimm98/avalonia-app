@@ -14,9 +14,9 @@
         </Window.Resources>
 
   <Grid RowDefinitions="Auto,*">
-    <Border Background="#1B1F26" Padding="12">
+    <Border Background="#E6E6E6" Padding="10">
       <DockPanel LastChildFill="False">
-        <TextBlock Text="{Binding Title}" Foreground="White" FontSize="16" FontWeight="SemiBold"/>
+        <TextBlock Text="{Binding Title}" Foreground="#1A1A1A" FontSize="16" FontWeight="SemiBold"/>
         <Button Content="Закрыть" DockPanel.Dock="Right" Click="Close_Click"/>
       </DockPanel>
     </Border>
@@ -40,7 +40,7 @@
 
       <dg:DataGrid.Columns>
         <dg:DataGridTextColumn Header="№" Binding="{Binding Number}" Width="50"/>
-        <dg:DataGridTextColumn Header="Дисциплина / Итого" Binding="{Binding DisciplineName}" Width="320"/>
+        <dg:DataGridTextColumn Header="Дисциплина" Binding="{Binding DisciplineName}" Width="320"/>
         <dg:DataGridTextColumn Header="Группа / Поручено/Выполнено" Binding="{Binding FacultyGroup}" Width="210"/>
 
         <dg:DataGridTextColumn Header="Курс" Binding="{Binding Course}" Width="60"/>
