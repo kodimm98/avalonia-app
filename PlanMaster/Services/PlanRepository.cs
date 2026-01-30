@@ -28,13 +28,13 @@ public class PlanRepository
     //     SaveAll/LoadAll работают как "Черновик"
     // -----------------------------
 
-    public async Task SaveAllAsync(List<PlanTable> tables, SummaryTable summary)
+    public async Task SaveAllAsync(List<PlanTable> tables, SummaryTable summary, MethodWorkTable methodical)
     {
         var draftId = await EnsureDraftPlanAsync();
-        await SavePlanAsync(draftId, DraftPlanName, tables, summary);
+        await SavePlanAsync(draftId, DraftPlanName, tables, summary, methodical);
     }
 
-    public async Task<(List<PlanTable> Tables, SummaryTable? Summary)> LoadAllAsync()
+    public async Task<(List<PlanTable> Tables, SummaryTable? Summary, MethodWorkTable? Methodical)> LoadAllAsync()
     {
         var draftId = await EnsureDraftPlanAsync();
         return await LoadPlanAsync(draftId);
@@ -73,7 +73,7 @@ public class PlanRepository
             .ToListAsync();
     }
 
-    public async Task<int> SaveAsNewPlanAsync(string? name, List<PlanTable> tables, SummaryTable summary)
+    public async Task<int> SaveAsNewPlanAsync(string? name, List<PlanTable> tables, SummaryTable summary, MethodWorkTable methodical)
     {
         await using var db = CreateContext();
 
@@ -92,16 +92,18 @@ public class PlanRepository
         // сохраняем содержимое как копию, привязывая к plan.Id
         var clonedTables = CloneTablesForPlan(plan.Id, tables);
         var clonedSummary = CloneSummaryForPlan(plan.Id, summary);
+        var clonedMethodical = CloneMethodicalForPlan(plan.Id, methodical);
 
         db.Tables.AddRange(clonedTables);
         db.SummaryTables.Add(clonedSummary);
+        db.MethodWorkTables.Add(clonedMethodical);
 
         await db.SaveChangesAsync();
 
         return plan.Id;
     }
 
-    public async Task SavePlanAsync(int planId, string? name, List<PlanTable> tables, SummaryTable summary)
+    public async Task SavePlanAsync(int planId, string? name, List<PlanTable> tables, SummaryTable summary, MethodWorkTable methodical)
     {
         await using var db = CreateContext();
 
@@ -128,19 +130,29 @@ public class PlanRepository
         if (oldSummary != null)
             db.SummaryTables.Remove(oldSummary);
 
+        var oldMethodical = await db.MethodWorkTables
+            .Where(m => m.PlanId == planId)
+            .Include(m => m.Rows)
+            .FirstOrDefaultAsync();
+
+        if (oldMethodical != null)
+            db.MethodWorkTables.Remove(oldMethodical);
+
         await db.SaveChangesAsync();
 
         // Добавляем новые данные
         var clonedTables = CloneTablesForPlan(planId, tables);
         var clonedSummary = CloneSummaryForPlan(planId, summary);
+        var clonedMethodical = CloneMethodicalForPlan(planId, methodical);
 
         db.Tables.AddRange(clonedTables);
         db.SummaryTables.Add(clonedSummary);
+        db.MethodWorkTables.Add(clonedMethodical);
 
         await db.SaveChangesAsync();
     }
 
-    public async Task<(List<PlanTable> Tables, SummaryTable? Summary)> LoadPlanAsync(int planId)
+    public async Task<(List<PlanTable> Tables, SummaryTable? Summary, MethodWorkTable? Methodical)> LoadPlanAsync(int planId)
     {
         await using var db = CreateContext();
 
@@ -155,7 +167,12 @@ public class PlanRepository
             .Include(s => s.Rows.OrderBy(r => r.RowOrder))
             .FirstOrDefaultAsync();
 
-        return (tables, summary);
+        var methodical = await db.MethodWorkTables
+            .Where(m => m.PlanId == planId)
+            .Include(m => m.Rows.OrderBy(r => r.RowOrder))
+            .FirstOrDefaultAsync();
+
+        return (tables, summary, methodical);
     }
 
     public async Task DeletePlanAsync(int planId)
@@ -270,5 +287,31 @@ public class PlanRepository
         }
 
         return ns;
+    }
+
+    private static MethodWorkTable CloneMethodicalForPlan(int planId, MethodWorkTable methodical)
+    {
+        var table = new MethodWorkTable
+        {
+            PlanId = planId,
+            CreatedAtUtc = DateTime.UtcNow,
+            Rows = new List<MethodWorkRow>()
+        };
+
+        foreach (var r in methodical.Rows.OrderBy(x => x.RowOrder))
+        {
+            table.Rows.Add(new MethodWorkRow
+            {
+                RowOrder = r.RowOrder,
+                Category = r.Category,
+                WorkName = r.WorkName,
+                TimeHours = r.TimeHours,
+                Deadline = r.Deadline,
+                CompletionNote = r.CompletionNote,
+                MethodWorkTable = table
+            });
+        }
+
+        return table;
     }
 }
