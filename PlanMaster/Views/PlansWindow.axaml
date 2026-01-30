@@ -1,0 +1,77 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PlanMaster.ViewModels"
+        x:Class="PlanMaster.Views.PlansWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1100" Height="700"
+        Title="Архив планов">
+
+  <Grid RowDefinitions="Auto,*">
+    <Border Background="#E6E6E6" Padding="10" BorderBrush="#BFC3C8" BorderThickness="0,0,0,1">
+      <DockPanel LastChildFill="False">
+        <TextBlock Text="Архив планов" Foreground="#1A1A1A" FontSize="16" FontWeight="SemiBold"/>
+        <Button Content="Закрыть" DockPanel.Dock="Right" Click="Close_Click"/>
+      </DockPanel>
+    </Border>
+
+    <Grid Grid.Row="1"
+          Margin="12"
+          ColumnDefinitions="320,*"
+          RowDefinitions="Auto,*"
+          RowSpacing="10"
+          ColumnSpacing="10">
+
+      <StackPanel Grid.ColumnSpan="2"
+                  Orientation="Horizontal"
+                  Spacing="8">
+        <TextBlock Text="Название:"
+                   VerticalAlignment="Center"
+                   Opacity="0.7"/>
+        <TextBox Width="360"
+                 Text="{Binding PlanName}"/>
+        <Button Content="Сохранить как новый план"
+                Click="SaveAsNewPlan_Click"/>
+        <Button Content="Сохранить изменения"
+                Click="SaveCurrentPlan_Click"
+                IsEnabled="{Binding CanSaveCurrentPlan}"/>
+        <Button Content="Обновить список"
+                Click="RefreshPlans_Click"/>
+        <Button Content="Удалить план"
+                Click="DeletePlan_Click"/>
+      </StackPanel>
+
+      <ListBox Grid.Row="1"
+               Grid.Column="0"
+               ItemsSource="{Binding Plans}"
+               SelectedItem="{Binding SelectedPlan}">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Margin="6">
+              <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+              <TextBlock Text="{Binding UpdatedAtUtc}" Opacity="0.6" FontSize="12"/>
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+      <Border Grid.Row="1"
+              Grid.Column="1"
+              Padding="12"
+              Background="#FAFAFB"
+              BorderBrush="#BFC3C8"
+              BorderThickness="1">
+        <StackPanel Spacing="8">
+          <TextBlock Text="Открытие плана"
+                     FontWeight="SemiBold"/>
+          <TextBlock Text="Выберите план слева и нажмите 'Открыть'."
+                     Opacity="0.7"/>
+          <Button Content="Открыть выбранный план"
+                  Click="OpenPlan_Click"
+                  Width="220"/>
+          <TextBlock Text="После открытия редактируйте таблицы во вкладках 'Учебная нагрузка/Итоговая таблица' и сохраняйте здесь."
+                     Opacity="0.7"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</Window>
