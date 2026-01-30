@@ -27,6 +27,7 @@ public sealed class ReportService
     private const string FontSizeBody = "16";   // 8pt
     private const string FontSizeHeader = "16"; // 8pt
     private const string FontSizeTitle = "20";  // 10pt
+    private const string HeaderFill = "EEF2F7";
 
     public ReportService(string templatePath)
     {
@@ -239,13 +240,12 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
             if (dataRows.Count == 0)
                 continue;
 
-            if (!isExtraLoad)
-                list.Add(TitleParagraph($"{t.SheetName} — {t.SemesterTitle}".Trim(' ', '—')));
+            list.Add(TitleParagraph($"{t.SheetName} — {t.SemesterTitle}".Trim(' ', '—')));
 
             var table = NewTeachingTable(isExtraLoad);
             var headerRowHeight = isExtraLoad ? 300 : 420;
             var subHeaderRowHeight = isExtraLoad ? 420 : 680;
-            var dataRowHeight = isExtraLoad ? 260 : 0;
+            var dataRowHeight = isExtraLoad ? 280 : 0;
 
             // 25 колонок (как TableGrid ниже)
             table.AppendChild(RowWithHeight(headerRowHeight,
@@ -512,10 +512,7 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         };
 
         return new Paragraph(new ParagraphProperties(
-            new SectionProperties(
-                new SectionType { Val = SectionMarkValues.NextPage },
-                pageSize,
-                pageMargin)));
+            new SectionProperties(pageSize, pageMargin)));
     }
 
     private static Paragraph SectionBreakPortrait()
@@ -539,10 +536,7 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         };
 
         return new Paragraph(new ParagraphProperties(
-            new SectionProperties(
-                new SectionType { Val = SectionMarkValues.NextPage },
-                pageSize,
-                pageMargin)));
+            new SectionProperties(pageSize, pageMargin)));
     }
 
     // -------------------- Table factories (FIXED layout + grids) --------------------
@@ -554,34 +548,34 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         // 25 колонок (как Header/Rows/Totals)
         var grid = isExtraLoad
             ? new TableGrid(
-                new GridColumn { Width = "420" },   // 1 №
-                new GridColumn { Width = "2900" },  // 2 дисциплина
-                new GridColumn { Width = "1800" },  // 3 группа
+                new GridColumn { Width = "520" },   // 1 №
+                new GridColumn { Width = "4200" },  // 2 дисциплина
+                new GridColumn { Width = "2600" },  // 3 группа
 
-                new GridColumn { Width = "420" },   // 4 курс
-                new GridColumn { Width = "460" },   // 5 потоков
-                new GridColumn { Width = "460" },   // 6 групп
-                new GridColumn { Width = "600" },   // 7 студентов
+                new GridColumn { Width = "560" },   // 4 курс
+                new GridColumn { Width = "600" },   // 5 потоков
+                new GridColumn { Width = "600" },   // 6 групп
+                new GridColumn { Width = "760" },   // 7 студентов
 
-                new GridColumn { Width = "420" },   // 8 лек
-                new GridColumn { Width = "420" },   // 9 пр
-                new GridColumn { Width = "420" },   // 10 лаб
-                new GridColumn { Width = "420" },   // 11 кср
-                new GridColumn { Width = "400" },   // 12 кп
-                new GridColumn { Width = "400" },   // 13 кр
-                new GridColumn { Width = "460" },   // 14 контр раб
-                new GridColumn { Width = "400" },   // 15 зач
-                new GridColumn { Width = "460" },   // 16 диф зач
-                new GridColumn { Width = "400" },   // 17 экз
-                new GridColumn { Width = "460" },   // 18 госэкз
-                new GridColumn { Width = "400" },   // 19 гэк
-                new GridColumn { Width = "460" },   // 20 рук вкр
-                new GridColumn { Width = "460" },   // 21 учпр
-                new GridColumn { Width = "460" },   // 22 прпр
-                new GridColumn { Width = "460" },   // 23 предпр
+                new GridColumn { Width = "520" },   // 8 лек
+                new GridColumn { Width = "520" },   // 9 пр
+                new GridColumn { Width = "520" },   // 10 лаб
+                new GridColumn { Width = "520" },   // 11 кср
+                new GridColumn { Width = "500" },   // 12 кп
+                new GridColumn { Width = "500" },   // 13 кр
+                new GridColumn { Width = "600" },   // 14 контр раб
+                new GridColumn { Width = "500" },   // 15 зач
+                new GridColumn { Width = "600" },   // 16 диф зач
+                new GridColumn { Width = "500" },   // 17 экз
+                new GridColumn { Width = "600" },   // 18 госэкз
+                new GridColumn { Width = "500" },   // 19 гэк
+                new GridColumn { Width = "600" },   // 20 рук вкр
+                new GridColumn { Width = "600" },   // 21 учпр
+                new GridColumn { Width = "600" },   // 22 прпр
+                new GridColumn { Width = "600" },   // 23 предпр
 
-                new GridColumn { Width = "560" },   // 24 всего
-                new GridColumn { Width = "880" }    // 25 примеч.
+                new GridColumn { Width = "760" },   // 24 всего
+                new GridColumn { Width = "1600" }   // 25 примеч.
             )
             : new TableGrid(
                 new GridColumn { Width = "420" },   // 1 №
@@ -720,7 +714,8 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         bool vMergeContinue = false)
     {
         var tcProps = new TableCellProperties(
-            new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Center }
+            new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Center },
+            new Shading { Val = ShadingPatternValues.Clear, Color = "auto", Fill = HeaderFill }
         );
 
         if (gridSpan > 1)
