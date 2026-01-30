@@ -124,4 +124,34 @@ private void ToggleLeft_Click(object? sender, Avalonia.Interactivity.RoutedEvent
 
         w.Show();
     }
+
+    private void PlansMenu_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm) return;
+
+        var window = new PlansWindow
+        {
+            DataContext = vm
+        };
+
+        window.Show(this);
+    }
+
+    private void AddMethodicalProcessRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddMethodicalProcessRow();
+    }
+
+    private void AddMethodicalPublishingRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddMethodicalPublishingRow();
+    }
+
+    private void AddMethodicalBaseRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddMethodicalBaseRow();
+    }
 }

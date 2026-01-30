@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PlanMaster.Models;
@@ -12,6 +13,10 @@ namespace PlanMaster.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    public const string MethodicalProcessCategory = "Разработка методического обеспечения учебного процесса";
+    public const string MethodicalPublishingCategory = "Подготовка к изданию учебно-методических разработок";
+    public const string MethodicalBaseCategory = "Совершенствование учебно-материальной базы";
+
     private readonly ExcelImportService _importService = new();
     private readonly SummaryCalculator _summaryCalculator = new();
     private readonly PlanRepository _repo;
@@ -45,6 +50,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         _reportService = new ReportService(TemplatePath);
 
+        ResetMethodicalRows();
+
         _ = RefreshPlansAsync();
     }
 
@@ -52,6 +59,9 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<PlanTable> Tables { get; } = new();
     public ObservableCollection<PlanRow> CurrentRows { get; } = new();
     public ObservableCollection<SummaryRow> SummaryRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> MethodicalProcessRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> MethodicalPublishingRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> MethodicalBaseRows { get; } = new();
 
     [ObservableProperty] private PlanTable? selectedTable;
     [ObservableProperty] private string statusText = "";
@@ -96,7 +106,8 @@ public partial class MainWindowViewModel : ViewModelBase
         foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
             SummaryRows.Add(r);
 
-        await _repo.SaveAllAsync(imported, summary);
+        ResetMethodicalRows();
+        await _repo.SaveAllAsync(imported, summary, BuildMethodicalFromUi());
 
         CurrentPlanId = null;
         PlanName = "";
@@ -111,7 +122,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         StatusText = "Загрузка из БД…";
 
-        var (tables, summary) = await _repo.LoadAllAsync();
+        var (tables, summary, methodical) = await _repo.LoadAllAsync();
 
         Tables.Clear();
         foreach (var t in tables.OrderBy(t => t.SheetName))
@@ -125,6 +136,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         CurrentPlanId = null;
         PlanName = "";
@@ -142,7 +155,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var summary = BuildSummaryFromUi();
         var recalced = _summaryCalculator.CreateOrUpdate(summary, Tables.ToList());
 
-        await _repo.SaveAllAsync(Tables.ToList(), recalced);
+        await _repo.SaveAllAsync(Tables.ToList(), recalced, BuildMethodicalFromUi());
 
         SummaryRows.Clear();
         foreach (var r in recalced.Rows.OrderBy(r => r.RowOrder))
@@ -201,7 +214,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         StatusText = "Открытие плана…";
 
-        var (tables, summary) = await _repo.LoadPlanAsync(SelectedPlan.Id);
+        var (tables, summary, methodical) = await _repo.LoadPlanAsync(SelectedPlan.Id);
 
         Tables.Clear();
         foreach (var t in tables.OrderBy(t => t.SheetName))
@@ -215,6 +228,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         CurrentPlanId = SelectedPlan.Id;
         PlanName = SelectedPlan.Name;
@@ -234,7 +249,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var summary = BuildSummaryFromUi();
         var recalced = _summaryCalculator.CreateOrUpdate(summary, Tables.ToList());
 
-        var newId = await _repo.SaveAsNewPlanAsync(PlanName, Tables.ToList(), recalced);
+        var newId = await _repo.SaveAsNewPlanAsync(PlanName, Tables.ToList(), recalced, BuildMethodicalFromUi());
 
         CurrentPlanId = newId;
         OnPropertyChanged(nameof(CanSaveCurrentPlan));
@@ -253,7 +268,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var summary = BuildSummaryFromUi();
         var recalced = _summaryCalculator.CreateOrUpdate(summary, Tables.ToList());
 
-        await _repo.SavePlanAsync(CurrentPlanId.Value, PlanName, Tables.ToList(), recalced);
+        await _repo.SavePlanAsync(CurrentPlanId.Value, PlanName, Tables.ToList(), recalced, BuildMethodicalFromUi());
 
         await RefreshPlansAsync();
 
@@ -279,6 +294,96 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         StatusText = "План удалён";
+    }
+
+    private void ResetMethodicalRows()
+    {
+        MethodicalProcessRows.Clear();
+        MethodicalPublishingRows.Clear();
+        MethodicalBaseRows.Clear();
+
+        MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
+        MethodicalPublishingRows.Add(new MethodWorkRow { Category = MethodicalPublishingCategory });
+        MethodicalBaseRows.Add(new MethodWorkRow { Category = MethodicalBaseCategory });
+    }
+
+    private void LoadMethodical(MethodWorkTable? table)
+    {
+        MethodicalProcessRows.Clear();
+        MethodicalPublishingRows.Clear();
+        MethodicalBaseRows.Clear();
+
+        if (table == null)
+        {
+            ResetMethodicalRows();
+            return;
+        }
+
+        foreach (var row in table.Rows.OrderBy(r => r.RowOrder))
+        {
+            var target = row.Category switch
+            {
+                MethodicalProcessCategory => MethodicalProcessRows,
+                MethodicalPublishingCategory => MethodicalPublishingRows,
+                MethodicalBaseCategory => MethodicalBaseRows,
+                _ => MethodicalProcessRows
+            };
+
+            target.Add(new MethodWorkRow
+            {
+                Category = row.Category,
+                WorkName = row.WorkName,
+                TimeHours = row.TimeHours,
+                Deadline = row.Deadline,
+                CompletionNote = row.CompletionNote
+            });
+        }
+
+        if (MethodicalProcessRows.Count == 0)
+            MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
+        if (MethodicalPublishingRows.Count == 0)
+            MethodicalPublishingRows.Add(new MethodWorkRow { Category = MethodicalPublishingCategory });
+        if (MethodicalBaseRows.Count == 0)
+            MethodicalBaseRows.Add(new MethodWorkRow { Category = MethodicalBaseCategory });
+    }
+
+    private MethodWorkTable BuildMethodicalFromUi()
+    {
+        var table = new MethodWorkTable
+        {
+            Rows = new List<MethodWorkRow>()
+        };
+
+        var rowOrder = 0;
+        AddRows(MethodicalProcessRows, MethodicalProcessCategory);
+        AddRows(MethodicalPublishingRows, MethodicalPublishingCategory);
+        AddRows(MethodicalBaseRows, MethodicalBaseCategory);
+
+        return table;
+
+        void AddRows(IEnumerable<MethodWorkRow> rows, string category)
+        {
+            foreach (var r in rows)
+            {
+                if (string.IsNullOrWhiteSpace(r.WorkName)
+                    && r.TimeHours is null
+                    && string.IsNullOrWhiteSpace(r.Deadline)
+                    && string.IsNullOrWhiteSpace(r.CompletionNote))
+                {
+                    continue;
+                }
+
+                table.Rows.Add(new MethodWorkRow
+                {
+                    RowOrder = rowOrder++,
+                    Category = category,
+                    WorkName = r.WorkName ?? "",
+                    TimeHours = r.TimeHours,
+                    Deadline = r.Deadline ?? "",
+                    CompletionNote = r.CompletionNote ?? ""
+                });
+            }
+        }
     }
 
     // -----------------------------
