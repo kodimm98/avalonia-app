@@ -148,6 +148,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         LoadMethodical(methodical);
 
+        LoadMethodical(methodical);
+
         CurrentPlanId = null;
         PlanName = "";
 
@@ -234,6 +236,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 
@@ -514,6 +518,105 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private static bool IsFirstSemester(DateTime date)
         => date.Month >= 9 || date.Month <= 2;
+
+    public void AddMethodicalProcessRow()
+        => MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
+
+    public void AddMethodicalPublishingRow()
+        => MethodicalPublishingRows.Add(new MethodWorkRow { Category = MethodicalPublishingCategory });
+
+    public void AddMethodicalBaseRow()
+        => MethodicalBaseRows.Add(new MethodWorkRow { Category = MethodicalBaseCategory });
+
+    private void ResetMethodicalRows()
+    {
+        MethodicalProcessRows.Clear();
+        MethodicalPublishingRows.Clear();
+        MethodicalBaseRows.Clear();
+
+        MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
+        MethodicalPublishingRows.Add(new MethodWorkRow { Category = MethodicalPublishingCategory });
+        MethodicalBaseRows.Add(new MethodWorkRow { Category = MethodicalBaseCategory });
+    }
+
+    private void LoadMethodical(MethodWorkTable? table)
+    {
+        MethodicalProcessRows.Clear();
+        MethodicalPublishingRows.Clear();
+        MethodicalBaseRows.Clear();
+
+        if (table == null)
+        {
+            ResetMethodicalRows();
+            return;
+        }
+
+        foreach (var row in table.Rows.OrderBy(r => r.RowOrder))
+        {
+            var target = row.Category switch
+            {
+                MethodicalProcessCategory => MethodicalProcessRows,
+                MethodicalPublishingCategory => MethodicalPublishingRows,
+                MethodicalBaseCategory => MethodicalBaseRows,
+                _ => MethodicalProcessRows
+            };
+
+            target.Add(new MethodWorkRow
+            {
+                Category = row.Category,
+                WorkName = row.WorkName,
+                TimeHours = row.TimeHours,
+                Deadline = row.Deadline,
+                CompletionNote = row.CompletionNote
+            });
+        }
+
+        if (MethodicalProcessRows.Count == 0)
+            MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
+        if (MethodicalPublishingRows.Count == 0)
+            MethodicalPublishingRows.Add(new MethodWorkRow { Category = MethodicalPublishingCategory });
+        if (MethodicalBaseRows.Count == 0)
+            MethodicalBaseRows.Add(new MethodWorkRow { Category = MethodicalBaseCategory });
+    }
+
+    private MethodWorkTable BuildMethodicalFromUi()
+    {
+        var table = new MethodWorkTable
+        {
+            Rows = new List<MethodWorkRow>()
+        };
+
+        var rowOrder = 0;
+        AddRows(MethodicalProcessRows, MethodicalProcessCategory);
+        AddRows(MethodicalPublishingRows, MethodicalPublishingCategory);
+        AddRows(MethodicalBaseRows, MethodicalBaseCategory);
+
+        return table;
+
+        void AddRows(IEnumerable<MethodWorkRow> rows, string category)
+        {
+            foreach (var r in rows)
+            {
+                if (string.IsNullOrWhiteSpace(r.WorkName)
+                    && r.TimeHours is null
+                    && string.IsNullOrWhiteSpace(r.Deadline)
+                    && string.IsNullOrWhiteSpace(r.CompletionNote))
+                {
+                    continue;
+                }
+
+                table.Rows.Add(new MethodWorkRow
+                {
+                    RowOrder = rowOrder++,
+                    Category = category,
+                    WorkName = r.WorkName ?? "",
+                    TimeHours = r.TimeHours,
+                    Deadline = r.Deadline ?? "",
+                    CompletionNote = r.CompletionNote ?? ""
+                });
+            }
+        }
+    }
 
     // -----------------------------
     //  C) Отчёт (DOCX/PDF: создать, открыть, печать)
