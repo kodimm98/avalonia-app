@@ -57,8 +57,8 @@ public string GenerateDocx(
     // 2-я закладка: следующие 2 таблицы
     var secondBlock = ordered.Skip(2).Take(2).ToList();
 
-    InsertAtBookmark(body, "BM_TEACHING_TABLES", BuildTeachingTables(firstBlock));
-    InsertAtBookmark(body, "BM_EXTRA_TEACHING_TABLES", BuildTeachingTables(secondBlock));
+    InsertAtBookmark(body, "BM_TEACHING_TABLES", BuildTeachingTables(firstBlock, isExtraLoad: false));
+    InsertAtBookmark(body, "BM_EXTRA_TEACHING_TABLES", BuildTeachingTables(secondBlock, isExtraLoad: true));
 
     // Итоговая
     InsertAtBookmark(body, "BM_SUMMARY_TABLE", new[] { BuildSummaryTable(summaryRows) });
@@ -226,7 +226,7 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         return false;
     }
 
-    private IEnumerable<OpenXmlElement> BuildTeachingTables(IReadOnlyList<PlanTable> tables)
+    private IEnumerable<OpenXmlElement> BuildTeachingTables(IReadOnlyList<PlanTable> tables, bool isExtraLoad)
     {
         var list = new List<OpenXmlElement>();
 
@@ -242,10 +242,12 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
 
             list.Add(TitleParagraph($"{t.SheetName} — {t.SemesterTitle}".Trim(' ', '—')));
 
-            var table = NewTeachingTable();
+            var table = NewTeachingTable(isExtraLoad);
+            var headerRowHeight = isExtraLoad ? 360 : 420;
+            var subHeaderRowHeight = isExtraLoad ? 520 : 680;
 
             // 25 колонок (как TableGrid ниже)
-            table.AppendChild(RowWithHeight(420,
+            table.AppendChild(RowWithHeight(headerRowHeight,
                 HeaderCell("№\nп.п.", vMergeRestart: true),                    // 1
                 HeaderCell("Наименование\nдисциплины", vMergeRestart: true),   // 2
                 HeaderCell("Факультет,\nспециальность,\nгруппа", vMergeRestart: true), // 3
@@ -255,7 +257,7 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
                 HeaderCell("Примеч.", vertical: true, vMergeRestart: true)     // 25
             ));
 
-            table.AppendChild(RowWithHeight(680,
+            table.AppendChild(RowWithHeight(subHeaderRowHeight,
                 HeaderCell("", vMergeContinue: true), // 1
                 HeaderCell("", vMergeContinue: true), // 2
                 HeaderCell("", vMergeContinue: true), // 3
@@ -446,41 +448,72 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
 
     // -------------------- Table factories (FIXED layout + grids) --------------------
 
-    private Table NewTeachingTable()
+    private Table NewTeachingTable(bool isExtraLoad)
     {
         var table = NewTableBaseFixed();
 
         // 25 колонок (как Header/Rows/Totals)
-        var grid = new TableGrid(
-            new GridColumn { Width = "420" },   // 1 №
-            new GridColumn { Width = "3400" },  // 2 дисциплина
-            new GridColumn { Width = "2100" },  // 3 группа
+        var grid = isExtraLoad
+            ? new TableGrid(
+                new GridColumn { Width = "460" },   // 1 №
+                new GridColumn { Width = "3800" },  // 2 дисциплина
+                new GridColumn { Width = "2300" },  // 3 группа
 
-            new GridColumn { Width = "480" },   // 4 курс
-            new GridColumn { Width = "520" },   // 5 потоков
-            new GridColumn { Width = "520" },   // 6 групп
-            new GridColumn { Width = "650" },   // 7 студентов
+                new GridColumn { Width = "520" },   // 4 курс
+                new GridColumn { Width = "560" },   // 5 потоков
+                new GridColumn { Width = "560" },   // 6 групп
+                new GridColumn { Width = "700" },   // 7 студентов
 
-            new GridColumn { Width = "430" },   // 8 лек
-            new GridColumn { Width = "430" },   // 9 пр
-            new GridColumn { Width = "430" },   // 10 лаб
-            new GridColumn { Width = "430" },   // 11 кср
-            new GridColumn { Width = "420" },   // 12 кп
-            new GridColumn { Width = "420" },   // 13 кр
-            new GridColumn { Width = "520" },   // 14 контр раб
-            new GridColumn { Width = "420" },   // 15 зач
-            new GridColumn { Width = "520" },   // 16 диф зач
-            new GridColumn { Width = "420" },   // 17 экз
-            new GridColumn { Width = "520" },   // 18 госэкз
-            new GridColumn { Width = "420" },   // 19 гэк
-            new GridColumn { Width = "520" },   // 20 рук вкр
-            new GridColumn { Width = "520" },   // 21 учпр
-            new GridColumn { Width = "520" },   // 22 прпр
-            new GridColumn { Width = "520" },   // 23 предпр
+                new GridColumn { Width = "480" },   // 8 лек
+                new GridColumn { Width = "480" },   // 9 пр
+                new GridColumn { Width = "480" },   // 10 лаб
+                new GridColumn { Width = "480" },   // 11 кср
+                new GridColumn { Width = "460" },   // 12 кп
+                new GridColumn { Width = "460" },   // 13 кр
+                new GridColumn { Width = "560" },   // 14 контр раб
+                new GridColumn { Width = "460" },   // 15 зач
+                new GridColumn { Width = "560" },   // 16 диф зач
+                new GridColumn { Width = "460" },   // 17 экз
+                new GridColumn { Width = "560" },   // 18 госэкз
+                new GridColumn { Width = "460" },   // 19 гэк
+                new GridColumn { Width = "560" },   // 20 рук вкр
+                new GridColumn { Width = "560" },   // 21 учпр
+                new GridColumn { Width = "560" },   // 22 прпр
+                new GridColumn { Width = "560" },   // 23 предпр
 
-            new GridColumn { Width = "620" },   // 24 всего
-            new GridColumn { Width = "1200" }   // 25 примеч.
-        );
+                new GridColumn { Width = "700" },   // 24 всего
+                new GridColumn { Width = "1400" }   // 25 примеч.
+            )
+            : new TableGrid(
+                new GridColumn { Width = "420" },   // 1 №
+                new GridColumn { Width = "3400" },  // 2 дисциплина
+                new GridColumn { Width = "2100" },  // 3 группа
+
+                new GridColumn { Width = "480" },   // 4 курс
+                new GridColumn { Width = "520" },   // 5 потоков
+                new GridColumn { Width = "520" },   // 6 групп
+                new GridColumn { Width = "650" },   // 7 студентов
+
+                new GridColumn { Width = "430" },   // 8 лек
+                new GridColumn { Width = "430" },   // 9 пр
+                new GridColumn { Width = "430" },   // 10 лаб
+                new GridColumn { Width = "430" },   // 11 кср
+                new GridColumn { Width = "420" },   // 12 кп
+                new GridColumn { Width = "420" },   // 13 кр
+                new GridColumn { Width = "520" },   // 14 контр раб
+                new GridColumn { Width = "420" },   // 15 зач
+                new GridColumn { Width = "520" },   // 16 диф зач
+                new GridColumn { Width = "420" },   // 17 экз
+                new GridColumn { Width = "520" },   // 18 госэкз
+                new GridColumn { Width = "420" },   // 19 гэк
+                new GridColumn { Width = "520" },   // 20 рук вкр
+                new GridColumn { Width = "520" },   // 21 учпр
+                new GridColumn { Width = "520" },   // 22 прпр
+                new GridColumn { Width = "520" },   // 23 предпр
+
+                new GridColumn { Width = "620" },   // 24 всего
+                new GridColumn { Width = "1200" }   // 25 примеч.
+            );
 
         table.InsertAt(grid, 0);
         return table;
@@ -556,7 +589,7 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         bool alignCenter = false,
         string fontSize = FontSizeBody)
     {
-        var runProps = new RunProperties(new FontSize { Val = fontSize });
+        var runProps = new RunProperties(new FontSize { Val = fontSize }, new NoProof());
         if (bold) runProps.Append(new Bold());
 
         var run = new Run(runProps, new Text(text) { Space = SpaceProcessingModeValues.Preserve });
@@ -608,7 +641,7 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
             new SpacingBetweenLines { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto }
         );
 
-        var runProps = new RunProperties(new FontSize { Val = FontSizeHeader }, new Bold());
+        var runProps = new RunProperties(new FontSize { Val = FontSizeHeader }, new Bold(), new NoProof());
         var run = new Run(runProps);
 
         var lines = text.Split('\n', StringSplitOptions.None);
