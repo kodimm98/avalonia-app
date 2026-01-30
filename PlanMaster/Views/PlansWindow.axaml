@@ -27,7 +27,7 @@
         <TextBlock Text="Название:"
                    VerticalAlignment="Center"
                    Opacity="0.7"/>
-        <TextBox Width="360"
+        <TextBox Width="260"
                  Text="{Binding PlanName}"/>
         <Button Content="Сохранить как новый план"
                 Click="SaveAsNewPlan_Click"/>
