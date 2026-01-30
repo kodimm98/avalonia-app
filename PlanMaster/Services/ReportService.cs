@@ -56,8 +56,8 @@ public string GenerateDocx(
     // 2-я закладка: следующие 2 таблицы
     var secondBlock = ordered.Skip(2).Take(2).ToList();
 
-    InsertAtBookmark(body, "BM_TEACHING_TABLES", BuildTeachingTables(firstBlock));
-    InsertAtBookmark(body, "BM_EXTRA_TEACHING_TABLES", BuildTeachingTables(secondBlock));
+    InsertAtBookmark(body, "BM_TEACHING_TABLES", BuildTeachingTables(firstBlock, isExtraLoad: false));
+    InsertAtBookmark(body, "BM_EXTRA_TEACHING_TABLES", BuildExtraLoadBlock(secondBlock));
 
     // Итоговая
     InsertAtBookmark(body, "BM_SUMMARY_TABLE", new[] { BuildSummaryTable(summaryRows) });
@@ -225,82 +225,134 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         return false;
     }
 
-    private IEnumerable<OpenXmlElement> BuildTeachingTables(IReadOnlyList<PlanTable> tables)
+    private IEnumerable<OpenXmlElement> BuildTeachingTables(IReadOnlyList<PlanTable> tables, bool isExtraLoad)
     {
         var list = new List<OpenXmlElement>();
 
         foreach (var t in tables.OrderBy(x => x.SheetName))
         {
+            var dataRows = t.Rows
+                .Where(r => !r.IsSummary)
+                .OrderBy(r => r.RowOrder)
+                .ToList();
+
+            if (dataRows.Count == 0)
+                continue;
+
             list.Add(TitleParagraph($"{t.SheetName} — {t.SemesterTitle}".Trim(' ', '—')));
 
-            var table = NewTeachingTable();
+            var table = NewTeachingTable(isExtraLoad);
+            var headerRowHeight = isExtraLoad ? 300 : 420;
+            var subHeaderRowHeight = isExtraLoad ? 420 : 680;
+            var dataRowHeight = isExtraLoad ? 280 : 0;
 
             // 25 колонок (как TableGrid ниже)
-            table.AppendChild(Row(
-                CellLines(true, "№", "п.п."),                    // 1
-                CellLines(true, "Наименование", "дисциплины"),   // 2
-                CellLines(true, "Факультет,", "спец., группа"),  // 3
-
-                CellLines(true, "Кол-во", "курс"),               // 4
-                CellLines(true, "Кол-во", "потоков"),            // 5
-                CellLines(true, "Кол-во", "групп"),              // 6
-                CellLines(true, "Кол-во", "студентов"),          // 7
-
-                CellLines(true, "лекц.", ""),                    // 8
-                CellLines(true, "практ.", ""),                   // 9
-                CellLines(true, "лаб.", ""),                     // 10
-                CellLines(true, "КСР", ""),                      // 11
-                CellLines(true, "КП", ""),                       // 12
-                CellLines(true, "КР", ""),                       // 13
-                CellLines(true, "контр.", "раб."),               // 14
-                CellLines(true, "зач.", ""),                     // 15
-                CellLines(true, "диф.", "зач."),                 // 16
-                CellLines(true, "экз.", ""),                     // 17
-                CellLines(true, "гос.", "экз."),                 // 18
-                CellLines(true, "ГЭК", ""),                      // 19
-                CellLines(true, "рук.", "ВКР"),                  // 20
-
-                CellLines(true, "уч.", "практ."),                // 21
-                CellLines(true, "произв.", "практ."),            // 22
-                CellLines(true, "предд.", "практ."),             // 23
-
-                CellLines(true, "ВСЕ", "ГО"),                    // 24
-                CellLines(true, "Примеч.", "")                   // 25
+            table.AppendChild(RowWithHeight(headerRowHeight,
+                HeaderCell("№\nп.п.", vMergeRestart: true),                    // 1
+                HeaderCell("Наименование\nдисциплины", vMergeRestart: true),   // 2
+                HeaderCell("Факультет,\nспециальность,\nгруппа", vMergeRestart: true), // 3
+                HeaderCell("Количество", gridSpan: 4),                         // 4-7
+                HeaderCell("Количество часов по видам", gridSpan: 16),         // 8-23
+                HeaderCell("Всего", vertical: true, vMergeRestart: true),      // 24
+                HeaderCell("Примеч.", vertical: true, vMergeRestart: true)     // 25
             ));
 
-            foreach (var r in t.Rows.OrderBy(r => r.RowOrder))
+            table.AppendChild(RowWithHeight(subHeaderRowHeight,
+                HeaderCell("", vMergeContinue: true), // 1
+                HeaderCell("", vMergeContinue: true), // 2
+                HeaderCell("", vMergeContinue: true), // 3
+
+                HeaderCell("курс", vertical: true),        // 4
+                HeaderCell("потоков", vertical: true),     // 5
+                HeaderCell("групп", vertical: true),       // 6
+                HeaderCell("студентов", vertical: true),   // 7
+
+                HeaderCell("лекц.", vertical: true),       // 8
+                HeaderCell("практ.", vertical: true),      // 9
+                HeaderCell("лаб.", vertical: true),        // 10
+                HeaderCell("КСР", vertical: true),         // 11
+                HeaderCell("КП", vertical: true),          // 12
+                HeaderCell("КР", vertical: true),          // 13
+                HeaderCell("контр.\nраб.", vertical: true),// 14
+                HeaderCell("зач.", vertical: true),        // 15
+                HeaderCell("диф.\nзач.", vertical: true),  // 16
+                HeaderCell("экз.", vertical: true),        // 17
+                HeaderCell("гос.\nэкз.", vertical: true),  // 18
+                HeaderCell("ГЭК", vertical: true),         // 19
+                HeaderCell("рук.\nВКР", vertical: true),    // 20
+                HeaderCell("уч.\nпракт.", vertical: true),  // 21
+                HeaderCell("произв.\nпракт.", vertical: true), // 22
+                HeaderCell("предд.\nпракт.", vertical: true),  // 23
+
+                HeaderCell("", vMergeContinue: true),      // 24
+                HeaderCell("", vMergeContinue: true)       // 25
+            ));
+
+            foreach (var r in dataRows)
             {
-                table.AppendChild(Row(
-                    CellText(r.Number?.ToString() ?? "", false, alignCenter: true),
-                    CellText(r.DisciplineName ?? "", false),
-                    CellText(r.FacultyGroup ?? "", false),
+                var row = dataRowHeight > 0
+                    ? RowWithHeight(dataRowHeight,
+                        CellText(r.Number?.ToString() ?? "", false, alignCenter: true),
+                        CellText(r.DisciplineName ?? "", false),
+                        CellText(r.FacultyGroup ?? "", false),
 
-                    CellText(Val(r.Course), false, alignCenter: true),
-                    CellText(Val(r.Streams), false, alignCenter: true),
-                    CellText(Val(r.Groups), false, alignCenter: true),
-                    CellText(Val(r.Students), false, alignCenter: true),
+                        CellText(Val(r.Course), false, alignCenter: true),
+                        CellText(Val(r.Streams), false, alignCenter: true),
+                        CellText(Val(r.Groups), false, alignCenter: true),
+                        CellText(Val(r.Students), false, alignCenter: true),
 
-                    CellText(Val(r.Lek), false, alignCenter: true),
-                    CellText(Val(r.Pr), false, alignCenter: true),
-                    CellText(Val(r.Lab), false, alignCenter: true),
-                    CellText(Val(r.Ksr), false, alignCenter: true),
-                    CellText(Val(r.Kp), false, alignCenter: true),
-                    CellText(Val(r.Kr), false, alignCenter: true),
-                    CellText(Val(r.KontrolRab), false, alignCenter: true),
-                    CellText(Val(r.Zach), false, alignCenter: true),
-                    CellText(Val(r.DifZach), false, alignCenter: true),
-                    CellText(Val(r.Exz), false, alignCenter: true),
-                    CellText(Val(r.GosExz), false, alignCenter: true),
-                    CellText(Val(r.Gek), false, alignCenter: true),
-                    CellText(Val(r.RukVkr), false, alignCenter: true),
+                        CellText(Val(r.Lek), false, alignCenter: true),
+                        CellText(Val(r.Pr), false, alignCenter: true),
+                        CellText(Val(r.Lab), false, alignCenter: true),
+                        CellText(Val(r.Ksr), false, alignCenter: true),
+                        CellText(Val(r.Kp), false, alignCenter: true),
+                        CellText(Val(r.Kr), false, alignCenter: true),
+                        CellText(Val(r.KontrolRab), false, alignCenter: true),
+                        CellText(Val(r.Zach), false, alignCenter: true),
+                        CellText(Val(r.DifZach), false, alignCenter: true),
+                        CellText(Val(r.Exz), false, alignCenter: true),
+                        CellText(Val(r.GosExz), false, alignCenter: true),
+                        CellText(Val(r.Gek), false, alignCenter: true),
+                        CellText(Val(r.RukVkr), false, alignCenter: true),
 
-                    CellText(Val(r.UchPr), false, alignCenter: true),
-                    CellText(Val(r.PrPr), false, alignCenter: true),
-                    CellText(Val(r.PredPr), false, alignCenter: true),
+                        CellText(Val(r.UchPr), false, alignCenter: true),
+                        CellText(Val(r.PrPr), false, alignCenter: true),
+                        CellText(Val(r.PredPr), false, alignCenter: true),
 
-                    CellText(Val(r.Total), false, alignCenter: true),
-                    CellText(r.Note ?? "", false)
-                ));
+                        CellText(Val(r.Total), false, alignCenter: true),
+                        CellText(r.Note ?? "", false))
+                    : Row(
+                        CellText(r.Number?.ToString() ?? "", false, alignCenter: true),
+                        CellText(r.DisciplineName ?? "", false),
+                        CellText(r.FacultyGroup ?? "", false),
+
+                        CellText(Val(r.Course), false, alignCenter: true),
+                        CellText(Val(r.Streams), false, alignCenter: true),
+                        CellText(Val(r.Groups), false, alignCenter: true),
+                        CellText(Val(r.Students), false, alignCenter: true),
+
+                        CellText(Val(r.Lek), false, alignCenter: true),
+                        CellText(Val(r.Pr), false, alignCenter: true),
+                        CellText(Val(r.Lab), false, alignCenter: true),
+                        CellText(Val(r.Ksr), false, alignCenter: true),
+                        CellText(Val(r.Kp), false, alignCenter: true),
+                        CellText(Val(r.Kr), false, alignCenter: true),
+                        CellText(Val(r.KontrolRab), false, alignCenter: true),
+                        CellText(Val(r.Zach), false, alignCenter: true),
+                        CellText(Val(r.DifZach), false, alignCenter: true),
+                        CellText(Val(r.Exz), false, alignCenter: true),
+                        CellText(Val(r.GosExz), false, alignCenter: true),
+                        CellText(Val(r.Gek), false, alignCenter: true),
+                        CellText(Val(r.RukVkr), false, alignCenter: true),
+
+                        CellText(Val(r.UchPr), false, alignCenter: true),
+                        CellText(Val(r.PrPr), false, alignCenter: true),
+                        CellText(Val(r.PredPr), false, alignCenter: true),
+
+                        CellText(Val(r.Total), false, alignCenter: true),
+                        CellText(r.Note ?? "", false));
+
+                table.AppendChild(row);
             }
 
             // Итоги снизу: без объединений (чтобы не было огромных ячеек)
@@ -313,6 +365,18 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         if (list.Count == 0)
             list.Add(new Paragraph(new Run(new Text(" "))));
 
+        return list;
+    }
+
+    private IEnumerable<OpenXmlElement> BuildExtraLoadBlock(IReadOnlyList<PlanTable> tables)
+    {
+        var list = new List<OpenXmlElement>
+        {
+            SectionBreakLandscape()
+        };
+
+        list.AddRange(BuildTeachingTables(tables, isExtraLoad: true));
+        list.Add(SectionBreakPortrait());
         return list;
     }
 
@@ -356,20 +420,20 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
 
         if (t.Sem1Plan.HasValue || t.Sem1Fact.HasValue)
         {
-            Add("Итого за 1 семестр:", "Поручено", t.Sem1Plan);
-            Add("Итого за 1 семестр:", "Выполнено", t.Sem1Fact);
+            Add(string.Empty, "Поручено", t.Sem1Plan);
+            Add(string.Empty, "Выполнено", t.Sem1Fact);
         }
 
         if (t.Sem2Plan.HasValue || t.Sem2Fact.HasValue)
         {
-            Add("Итого за 2 семестр:", "Поручено", t.Sem2Plan);
-            Add("Итого за 2 семестр:", "Выполнено", t.Sem2Fact);
+            Add(string.Empty, "Поручено", t.Sem2Plan);
+            Add(string.Empty, "Выполнено", t.Sem2Fact);
         }
 
         if (t.YearPlan.HasValue || t.YearFact.HasValue)
         {
-            Add("Итого за год:", "Поручено", t.YearPlan);
-            Add("Итого за год:", "Выполнено", t.YearFact);
+            Add(string.Empty, "Поручено", t.YearPlan);
+            Add(string.Empty, "Выполнено", t.YearFact);
         }
     }
 
@@ -377,15 +441,23 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
     {
         var table = NewSummaryTable();
 
-        table.AppendChild(Row(
-            CellLines(true, "№", "п.п."),
-            CellLines(true, "Виды работ", "(в часах)"),
-            CellLines(true, "1 семестр", "план"),
-            CellLines(true, "1 семестр", "факт"),
-            CellLines(true, "2 семестр", "план"),
-            CellLines(true, "2 семестр", "факт"),
-            CellLines(true, "На год", "план"),
-            CellLines(true, "На год", "факт")
+        table.AppendChild(RowWithHeight(420,
+            HeaderCell("№\nп.п.", vMergeRestart: true),
+            HeaderCell("Виды работ\n(в часах)", vMergeRestart: true),
+            HeaderCell("1 семестр", gridSpan: 2),
+            HeaderCell("2 семестр", gridSpan: 2),
+            HeaderCell("На год", gridSpan: 2)
+        ));
+
+        table.AppendChild(RowWithHeight(360,
+            HeaderCell("", vMergeContinue: true),
+            HeaderCell("", vMergeContinue: true),
+            HeaderCell("план"),
+            HeaderCell("факт"),
+            HeaderCell("план"),
+            HeaderCell("факт"),
+            HeaderCell("план"),
+            HeaderCell("факт")
         ));
 
         foreach (var r in rows.OrderBy(r => r.RowOrder))
@@ -418,43 +490,122 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
 
     private static Paragraph Spacer() => new Paragraph(new Run(new Text(" ")));
 
+    private static Paragraph SectionBreakLandscape()
+    {
+        var pageSize = new PageSize
+        {
+            Width = 16838,
+            Height = 11906,
+            Orient = PageOrientationValues.Landscape
+        };
+
+        var pageMargin = new PageMargin
+        {
+            Top = 720,
+            Bottom = 720,
+            Left = 720,
+            Right = 720,
+            Header = 720,
+            Footer = 720,
+            Gutter = 0
+        };
+
+        return new Paragraph(new ParagraphProperties(
+            new SectionProperties(pageSize, pageMargin)));
+    }
+
+    private static Paragraph SectionBreakPortrait()
+    {
+        var pageSize = new PageSize
+        {
+            Width = 11906,
+            Height = 16838,
+            Orient = PageOrientationValues.Portrait
+        };
+
+        var pageMargin = new PageMargin
+        {
+            Top = 720,
+            Bottom = 720,
+            Left = 720,
+            Right = 720,
+            Header = 720,
+            Footer = 720,
+            Gutter = 0
+        };
+
+        return new Paragraph(new ParagraphProperties(
+            new SectionProperties(pageSize, pageMargin)));
+    }
+
     // -------------------- Table factories (FIXED layout + grids) --------------------
 
-    private Table NewTeachingTable()
+    private Table NewTeachingTable(bool isExtraLoad)
     {
         var table = NewTableBaseFixed();
 
         // 25 колонок (как Header/Rows/Totals)
-        var grid = new TableGrid(
-            new GridColumn { Width = "420" },   // 1 №
-            new GridColumn { Width = "3400" },  // 2 дисциплина
-            new GridColumn { Width = "2100" },  // 3 группа
+        var grid = isExtraLoad
+            ? new TableGrid(
+                new GridColumn { Width = "520" },   // 1 №
+                new GridColumn { Width = "4200" },  // 2 дисциплина
+                new GridColumn { Width = "2600" },  // 3 группа
 
-            new GridColumn { Width = "480" },   // 4 курс
-            new GridColumn { Width = "520" },   // 5 потоков
-            new GridColumn { Width = "520" },   // 6 групп
-            new GridColumn { Width = "650" },   // 7 студентов
+                new GridColumn { Width = "560" },   // 4 курс
+                new GridColumn { Width = "600" },   // 5 потоков
+                new GridColumn { Width = "600" },   // 6 групп
+                new GridColumn { Width = "760" },   // 7 студентов
 
-            new GridColumn { Width = "430" },   // 8 лек
-            new GridColumn { Width = "430" },   // 9 пр
-            new GridColumn { Width = "430" },   // 10 лаб
-            new GridColumn { Width = "430" },   // 11 кср
-            new GridColumn { Width = "420" },   // 12 кп
-            new GridColumn { Width = "420" },   // 13 кр
-            new GridColumn { Width = "520" },   // 14 контр раб
-            new GridColumn { Width = "420" },   // 15 зач
-            new GridColumn { Width = "520" },   // 16 диф зач
-            new GridColumn { Width = "420" },   // 17 экз
-            new GridColumn { Width = "520" },   // 18 госэкз
-            new GridColumn { Width = "420" },   // 19 гэк
-            new GridColumn { Width = "520" },   // 20 рук вкр
-            new GridColumn { Width = "520" },   // 21 учпр
-            new GridColumn { Width = "520" },   // 22 прпр
-            new GridColumn { Width = "520" },   // 23 предпр
+                new GridColumn { Width = "520" },   // 8 лек
+                new GridColumn { Width = "520" },   // 9 пр
+                new GridColumn { Width = "520" },   // 10 лаб
+                new GridColumn { Width = "520" },   // 11 кср
+                new GridColumn { Width = "500" },   // 12 кп
+                new GridColumn { Width = "500" },   // 13 кр
+                new GridColumn { Width = "600" },   // 14 контр раб
+                new GridColumn { Width = "500" },   // 15 зач
+                new GridColumn { Width = "600" },   // 16 диф зач
+                new GridColumn { Width = "500" },   // 17 экз
+                new GridColumn { Width = "600" },   // 18 госэкз
+                new GridColumn { Width = "500" },   // 19 гэк
+                new GridColumn { Width = "600" },   // 20 рук вкр
+                new GridColumn { Width = "600" },   // 21 учпр
+                new GridColumn { Width = "600" },   // 22 прпр
+                new GridColumn { Width = "600" },   // 23 предпр
 
-            new GridColumn { Width = "620" },   // 24 всего
-            new GridColumn { Width = "1200" }   // 25 примеч.
-        );
+                new GridColumn { Width = "760" },   // 24 всего
+                new GridColumn { Width = "1600" }   // 25 примеч.
+            )
+            : new TableGrid(
+                new GridColumn { Width = "420" },   // 1 №
+                new GridColumn { Width = "3400" },  // 2 дисциплина
+                new GridColumn { Width = "2100" },  // 3 группа
+
+                new GridColumn { Width = "480" },   // 4 курс
+                new GridColumn { Width = "520" },   // 5 потоков
+                new GridColumn { Width = "520" },   // 6 групп
+                new GridColumn { Width = "650" },   // 7 студентов
+
+                new GridColumn { Width = "430" },   // 8 лек
+                new GridColumn { Width = "430" },   // 9 пр
+                new GridColumn { Width = "430" },   // 10 лаб
+                new GridColumn { Width = "430" },   // 11 кср
+                new GridColumn { Width = "420" },   // 12 кп
+                new GridColumn { Width = "420" },   // 13 кр
+                new GridColumn { Width = "520" },   // 14 контр раб
+                new GridColumn { Width = "420" },   // 15 зач
+                new GridColumn { Width = "520" },   // 16 диф зач
+                new GridColumn { Width = "420" },   // 17 экз
+                new GridColumn { Width = "520" },   // 18 госэкз
+                new GridColumn { Width = "420" },   // 19 гэк
+                new GridColumn { Width = "520" },   // 20 рук вкр
+                new GridColumn { Width = "520" },   // 21 учпр
+                new GridColumn { Width = "520" },   // 22 прпр
+                new GridColumn { Width = "520" },   // 23 предпр
+
+                new GridColumn { Width = "620" },   // 24 всего
+                new GridColumn { Width = "1200" }   // 25 примеч.
+            );
 
         table.InsertAt(grid, 0);
         return table;
@@ -515,6 +666,14 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         return r;
     }
 
+    private static TableRow RowWithHeight(int height, params TableCell[] cells)
+    {
+        var row = Row(cells);
+        row.PrependChild(new TableRowProperties(
+            new TableRowHeight { Val = (uint)height, HeightType = HeightRuleValues.AtLeast }));
+        return row;
+    }
+
     private static TableCell CellText(
         string text,
         bool bold,
@@ -522,7 +681,7 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         bool alignCenter = false,
         string fontSize = FontSizeBody)
     {
-        var runProps = new RunProperties(new FontSize { Val = fontSize });
+        var runProps = new RunProperties(new FontSize { Val = fontSize }, new NoProof());
         if (bold) runProps.Append(new Bold());
 
         var run = new Run(runProps, new Text(text) { Space = SpaceProcessingModeValues.Preserve });
@@ -546,31 +705,45 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         return new TableCell(tcProps, para);
     }
 
-    private static TableCell CellLines(bool bold, string line1, string line2)
+    private static TableCell HeaderCell(
+        string text,
+        int gridSpan = 1,
+        bool vertical = false,
+        bool vMergeRestart = false,
+        bool vMergeContinue = false)
     {
         var tcProps = new TableCellProperties(
             new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Center }
         );
+
+        if (gridSpan > 1)
+            tcProps.AppendChild(new GridSpan { Val = gridSpan });
+
+        if (vMergeRestart)
+            tcProps.AppendChild(new VerticalMerge { Val = MergedCellValues.Restart });
+        else if (vMergeContinue)
+            tcProps.AppendChild(new VerticalMerge { Val = MergedCellValues.Continue });
+
+        if (vertical)
+            tcProps.AppendChild(new TextDirection { Val = TextDirectionValues.BottomToTopLeftToRight });
 
         var pPr = new ParagraphProperties(
             new Justification { Val = JustificationValues.Center },
             new SpacingBetweenLines { Before = "0", After = "0", Line = "240", LineRule = LineSpacingRuleValues.Auto }
         );
 
-        var runProps = new RunProperties(new FontSize { Val = FontSizeHeader });
-        if (bold) runProps.Append(new Bold());
-
+        var runProps = new RunProperties(new FontSize { Val = FontSizeHeader }, new Bold(), new NoProof());
         var run = new Run(runProps);
-        run.Append(new Text(line1) { Space = SpaceProcessingModeValues.Preserve });
 
-        if (!string.IsNullOrWhiteSpace(line2))
+        var lines = text.Split('\n', StringSplitOptions.None);
+        for (var i = 0; i < lines.Length; i++)
         {
-            run.Append(new Break());
-            run.Append(new Text(line2) { Space = SpaceProcessingModeValues.Preserve });
+            if (i > 0)
+                run.Append(new Break());
+            run.Append(new Text(lines[i]) { Space = SpaceProcessingModeValues.Preserve });
         }
 
         var para = new Paragraph(pPr, run);
-
         return new TableCell(tcProps, para);
     }
 }
