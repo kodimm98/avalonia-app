@@ -243,8 +243,9 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
             list.Add(TitleParagraph($"{t.SheetName} — {t.SemesterTitle}".Trim(' ', '—')));
 
             var table = NewTeachingTable(isExtraLoad);
-            var headerRowHeight = isExtraLoad ? 360 : 420;
-            var subHeaderRowHeight = isExtraLoad ? 520 : 680;
+            var headerRowHeight = isExtraLoad ? 300 : 420;
+            var subHeaderRowHeight = isExtraLoad ? 420 : 680;
+            var dataRowHeight = isExtraLoad ? 280 : 0;
 
             // 25 колонок (как TableGrid ниже)
             table.AppendChild(RowWithHeight(headerRowHeight,
@@ -290,37 +291,69 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
 
             foreach (var r in dataRows)
             {
-                table.AppendChild(Row(
-                    CellText(r.Number?.ToString() ?? "", false, alignCenter: true),
-                    CellText(r.DisciplineName ?? "", false),
-                    CellText(r.FacultyGroup ?? "", false),
+                var row = dataRowHeight > 0
+                    ? RowWithHeight(dataRowHeight,
+                        CellText(r.Number?.ToString() ?? "", false, alignCenter: true),
+                        CellText(r.DisciplineName ?? "", false),
+                        CellText(r.FacultyGroup ?? "", false),
 
-                    CellText(Val(r.Course), false, alignCenter: true),
-                    CellText(Val(r.Streams), false, alignCenter: true),
-                    CellText(Val(r.Groups), false, alignCenter: true),
-                    CellText(Val(r.Students), false, alignCenter: true),
+                        CellText(Val(r.Course), false, alignCenter: true),
+                        CellText(Val(r.Streams), false, alignCenter: true),
+                        CellText(Val(r.Groups), false, alignCenter: true),
+                        CellText(Val(r.Students), false, alignCenter: true),
 
-                    CellText(Val(r.Lek), false, alignCenter: true),
-                    CellText(Val(r.Pr), false, alignCenter: true),
-                    CellText(Val(r.Lab), false, alignCenter: true),
-                    CellText(Val(r.Ksr), false, alignCenter: true),
-                    CellText(Val(r.Kp), false, alignCenter: true),
-                    CellText(Val(r.Kr), false, alignCenter: true),
-                    CellText(Val(r.KontrolRab), false, alignCenter: true),
-                    CellText(Val(r.Zach), false, alignCenter: true),
-                    CellText(Val(r.DifZach), false, alignCenter: true),
-                    CellText(Val(r.Exz), false, alignCenter: true),
-                    CellText(Val(r.GosExz), false, alignCenter: true),
-                    CellText(Val(r.Gek), false, alignCenter: true),
-                    CellText(Val(r.RukVkr), false, alignCenter: true),
+                        CellText(Val(r.Lek), false, alignCenter: true),
+                        CellText(Val(r.Pr), false, alignCenter: true),
+                        CellText(Val(r.Lab), false, alignCenter: true),
+                        CellText(Val(r.Ksr), false, alignCenter: true),
+                        CellText(Val(r.Kp), false, alignCenter: true),
+                        CellText(Val(r.Kr), false, alignCenter: true),
+                        CellText(Val(r.KontrolRab), false, alignCenter: true),
+                        CellText(Val(r.Zach), false, alignCenter: true),
+                        CellText(Val(r.DifZach), false, alignCenter: true),
+                        CellText(Val(r.Exz), false, alignCenter: true),
+                        CellText(Val(r.GosExz), false, alignCenter: true),
+                        CellText(Val(r.Gek), false, alignCenter: true),
+                        CellText(Val(r.RukVkr), false, alignCenter: true),
 
-                    CellText(Val(r.UchPr), false, alignCenter: true),
-                    CellText(Val(r.PrPr), false, alignCenter: true),
-                    CellText(Val(r.PredPr), false, alignCenter: true),
+                        CellText(Val(r.UchPr), false, alignCenter: true),
+                        CellText(Val(r.PrPr), false, alignCenter: true),
+                        CellText(Val(r.PredPr), false, alignCenter: true),
 
-                    CellText(Val(r.Total), false, alignCenter: true),
-                    CellText(r.Note ?? "", false)
-                ));
+                        CellText(Val(r.Total), false, alignCenter: true),
+                        CellText(r.Note ?? "", false))
+                    : Row(
+                        CellText(r.Number?.ToString() ?? "", false, alignCenter: true),
+                        CellText(r.DisciplineName ?? "", false),
+                        CellText(r.FacultyGroup ?? "", false),
+
+                        CellText(Val(r.Course), false, alignCenter: true),
+                        CellText(Val(r.Streams), false, alignCenter: true),
+                        CellText(Val(r.Groups), false, alignCenter: true),
+                        CellText(Val(r.Students), false, alignCenter: true),
+
+                        CellText(Val(r.Lek), false, alignCenter: true),
+                        CellText(Val(r.Pr), false, alignCenter: true),
+                        CellText(Val(r.Lab), false, alignCenter: true),
+                        CellText(Val(r.Ksr), false, alignCenter: true),
+                        CellText(Val(r.Kp), false, alignCenter: true),
+                        CellText(Val(r.Kr), false, alignCenter: true),
+                        CellText(Val(r.KontrolRab), false, alignCenter: true),
+                        CellText(Val(r.Zach), false, alignCenter: true),
+                        CellText(Val(r.DifZach), false, alignCenter: true),
+                        CellText(Val(r.Exz), false, alignCenter: true),
+                        CellText(Val(r.GosExz), false, alignCenter: true),
+                        CellText(Val(r.Gek), false, alignCenter: true),
+                        CellText(Val(r.RukVkr), false, alignCenter: true),
+
+                        CellText(Val(r.UchPr), false, alignCenter: true),
+                        CellText(Val(r.PrPr), false, alignCenter: true),
+                        CellText(Val(r.PredPr), false, alignCenter: true),
+
+                        CellText(Val(r.Total), false, alignCenter: true),
+                        CellText(r.Note ?? "", false));
+
+                table.AppendChild(row);
             }
 
             // Итоги снизу: без объединений (чтобы не было огромных ячеек)
@@ -455,34 +488,34 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         // 25 колонок (как Header/Rows/Totals)
         var grid = isExtraLoad
             ? new TableGrid(
-                new GridColumn { Width = "460" },   // 1 №
-                new GridColumn { Width = "3800" },  // 2 дисциплина
-                new GridColumn { Width = "2300" },  // 3 группа
+                new GridColumn { Width = "520" },   // 1 №
+                new GridColumn { Width = "4200" },  // 2 дисциплина
+                new GridColumn { Width = "2600" },  // 3 группа
 
-                new GridColumn { Width = "520" },   // 4 курс
-                new GridColumn { Width = "560" },   // 5 потоков
-                new GridColumn { Width = "560" },   // 6 групп
-                new GridColumn { Width = "700" },   // 7 студентов
+                new GridColumn { Width = "560" },   // 4 курс
+                new GridColumn { Width = "600" },   // 5 потоков
+                new GridColumn { Width = "600" },   // 6 групп
+                new GridColumn { Width = "760" },   // 7 студентов
 
-                new GridColumn { Width = "480" },   // 8 лек
-                new GridColumn { Width = "480" },   // 9 пр
-                new GridColumn { Width = "480" },   // 10 лаб
-                new GridColumn { Width = "480" },   // 11 кср
-                new GridColumn { Width = "460" },   // 12 кп
-                new GridColumn { Width = "460" },   // 13 кр
-                new GridColumn { Width = "560" },   // 14 контр раб
-                new GridColumn { Width = "460" },   // 15 зач
-                new GridColumn { Width = "560" },   // 16 диф зач
-                new GridColumn { Width = "460" },   // 17 экз
-                new GridColumn { Width = "560" },   // 18 госэкз
-                new GridColumn { Width = "460" },   // 19 гэк
-                new GridColumn { Width = "560" },   // 20 рук вкр
-                new GridColumn { Width = "560" },   // 21 учпр
-                new GridColumn { Width = "560" },   // 22 прпр
-                new GridColumn { Width = "560" },   // 23 предпр
+                new GridColumn { Width = "520" },   // 8 лек
+                new GridColumn { Width = "520" },   // 9 пр
+                new GridColumn { Width = "520" },   // 10 лаб
+                new GridColumn { Width = "520" },   // 11 кср
+                new GridColumn { Width = "500" },   // 12 кп
+                new GridColumn { Width = "500" },   // 13 кр
+                new GridColumn { Width = "600" },   // 14 контр раб
+                new GridColumn { Width = "500" },   // 15 зач
+                new GridColumn { Width = "600" },   // 16 диф зач
+                new GridColumn { Width = "500" },   // 17 экз
+                new GridColumn { Width = "600" },   // 18 госэкз
+                new GridColumn { Width = "500" },   // 19 гэк
+                new GridColumn { Width = "600" },   // 20 рук вкр
+                new GridColumn { Width = "600" },   // 21 учпр
+                new GridColumn { Width = "600" },   // 22 прпр
+                new GridColumn { Width = "600" },   // 23 предпр
 
-                new GridColumn { Width = "700" },   // 24 всего
-                new GridColumn { Width = "1400" }   // 25 примеч.
+                new GridColumn { Width = "760" },   // 24 всего
+                new GridColumn { Width = "1600" }   // 25 примеч.
             )
             : new TableGrid(
                 new GridColumn { Width = "420" },   // 1 №
