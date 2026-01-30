@@ -27,6 +27,7 @@ public sealed class ReportService
     private const string FontSizeBody = "16";   // 8pt
     private const string FontSizeHeader = "16"; // 8pt
     private const string FontSizeTitle = "20";  // 10pt
+    private const string HeaderFill = "EEF2F7";
 
     public ReportService(string templatePath)
     {
@@ -653,7 +654,8 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         bool vMergeContinue = false)
     {
         var tcProps = new TableCellProperties(
-            new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Center }
+            new TableCellVerticalAlignment { Val = TableVerticalAlignmentValues.Center },
+            new Shading { Val = ShadingPatternValues.Clear, Color = "auto", Fill = HeaderFill }
         );
 
         if (gridSpan > 1)
