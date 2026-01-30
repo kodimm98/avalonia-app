@@ -8,6 +8,10 @@ namespace PlanMaster.ViewModels;
 
 public partial class MainWindowViewModel
 {
+    public bool CanDeleteMethodicalProcessRow => SelectedMethodicalProcessRow != null;
+    public bool CanDeleteMethodicalPublishingRow => SelectedMethodicalPublishingRow != null;
+    public bool CanDeleteMethodicalBaseRow => SelectedMethodicalBaseRow != null;
+
     public void AddMethodicalProcessRow()
         => MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
 

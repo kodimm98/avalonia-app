@@ -70,14 +70,6 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private PlanTable? selectedTable;
     [ObservableProperty] private string statusText = "";
 
-    public bool CanDeleteMethodicalProcessRow => SelectedMethodicalProcessRow != null;
-    public bool CanDeleteMethodicalPublishingRow => SelectedMethodicalPublishingRow != null;
-    public bool CanDeleteMethodicalBaseRow => SelectedMethodicalBaseRow != null;
-
-    public bool CanDeleteMethodicalProcessRow => SelectedMethodicalProcessRow != null;
-    public bool CanDeleteMethodicalPublishingRow => SelectedMethodicalPublishingRow != null;
-    public bool CanDeleteMethodicalBaseRow => SelectedMethodicalBaseRow != null;
-
     public string SelectedTableTitle
         => SelectedTable is null
             ? "Таблица не выбрана"
@@ -148,6 +140,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 
@@ -241,6 +235,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 
