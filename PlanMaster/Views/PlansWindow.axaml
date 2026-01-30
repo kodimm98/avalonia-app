@@ -4,12 +4,12 @@
         x:Class="PlanMaster.Views.PlansWindow"
         x:DataType="vm:MainWindowViewModel"
         Width="1100" Height="700"
-        Title="Планы">
+        Title="Архив планов">
 
   <Grid RowDefinitions="Auto,*">
     <Border Background="#E6E6E6" Padding="10" BorderBrush="#BFC3C8" BorderThickness="0,0,0,1">
       <DockPanel LastChildFill="False">
-        <TextBlock Text="Планы" Foreground="#1A1A1A" FontSize="16" FontWeight="SemiBold"/>
+        <TextBlock Text="Архив планов" Foreground="#1A1A1A" FontSize="16" FontWeight="SemiBold"/>
         <Button Content="Закрыть" DockPanel.Dock="Right" Click="Close_Click"/>
       </DockPanel>
     </Border>
