@@ -58,7 +58,7 @@ public string GenerateDocx(
     var secondBlock = ordered.Skip(2).Take(2).ToList();
 
     InsertAtBookmark(body, "BM_TEACHING_TABLES", BuildTeachingTables(firstBlock, isExtraLoad: false));
-    InsertAtBookmark(body, "BM_EXTRA_TEACHING_TABLES", BuildTeachingTables(secondBlock, isExtraLoad: true));
+    InsertAtBookmark(body, "BM_EXTRA_TEACHING_TABLES", BuildExtraLoadBlock(secondBlock));
 
     // Итоговая
     InsertAtBookmark(body, "BM_SUMMARY_TABLE", new[] { BuildSummaryTable(summaryRows) });
@@ -369,6 +369,18 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
         return list;
     }
 
+    private IEnumerable<OpenXmlElement> BuildExtraLoadBlock(IReadOnlyList<PlanTable> tables)
+    {
+        var list = new List<OpenXmlElement>
+        {
+            SectionBreakLandscape()
+        };
+
+        list.AddRange(BuildTeachingTables(tables, isExtraLoad: true));
+        list.Add(SectionBreakPortrait());
+        return list;
+    }
+
     private void AppendTotalsRows(Table table, PlanTable t)
     {
         // 25 колонок:
@@ -478,6 +490,54 @@ private static void InsertAtBookmark(Body body, string bookmarkName, IEnumerable
                 new Text(text)));
 
     private static Paragraph Spacer() => new Paragraph(new Run(new Text(" ")));
+
+    private static Paragraph SectionBreakLandscape()
+    {
+        var pageSize = new PageSize
+        {
+            Width = 16838,
+            Height = 11906,
+            Orient = PageOrientationValues.Landscape
+        };
+
+        var pageMargin = new PageMargin
+        {
+            Top = 720,
+            Bottom = 720,
+            Left = 720,
+            Right = 720,
+            Header = 720,
+            Footer = 720,
+            Gutter = 0
+        };
+
+        return new Paragraph(new ParagraphProperties(
+            new SectionProperties(pageSize, pageMargin)));
+    }
+
+    private static Paragraph SectionBreakPortrait()
+    {
+        var pageSize = new PageSize
+        {
+            Width = 11906,
+            Height = 16838,
+            Orient = PageOrientationValues.Portrait
+        };
+
+        var pageMargin = new PageMargin
+        {
+            Top = 720,
+            Bottom = 720,
+            Left = 720,
+            Right = 720,
+            Header = 720,
+            Footer = 720,
+            Gutter = 0
+        };
+
+        return new Paragraph(new ParagraphProperties(
+            new SectionProperties(pageSize, pageMargin)));
+    }
 
     // -------------------- Table factories (FIXED layout + grids) --------------------
 
