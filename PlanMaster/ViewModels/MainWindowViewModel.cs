@@ -158,6 +158,28 @@ public partial class MainWindowViewModel : ViewModelBase
 
         LoadMethodical(methodical);
 
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
         CurrentPlanId = null;
         PlanName = "";
 
@@ -244,6 +266,28 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 
