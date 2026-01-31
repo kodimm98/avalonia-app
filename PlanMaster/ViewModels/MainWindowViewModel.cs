@@ -160,6 +160,9 @@ public partial class MainWindowViewModel : ViewModelBase
         EnsureMethodicalRows();
 
         LoadMethodical(methodical);
+        EnsureMethodicalRows();
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 
@@ -269,6 +272,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 

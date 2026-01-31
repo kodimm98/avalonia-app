@@ -281,8 +281,23 @@ public partial class MainWindowViewModel
     public void RecalculateTableTotals(PlanTable? table)
     {
         if (table == null) return;
+        RecalculateTeachingTableTotals(table);
         RecalculateTotalsFromSummaryRows(table);
         RecalculateSummaryFromTables();
+    }
+
+    private static void RecalculateTeachingTableTotals(PlanTable table)
+    {
+        foreach (var row in table.Rows.Where(r => !r.IsSummary))
+        {
+            row.Total = SumHours(row);
+        }
+
+        var total = table.Rows.Where(r => !r.IsSummary).Sum(r => r.Total ?? 0);
+        foreach (var summaryRow in table.Rows.Where(r => r.IsSummary))
+        {
+            summaryRow.Total = total;
+        }
     }
 
     private static void RecalculateTotalsFromSummaryRows(PlanTable table)
@@ -301,6 +316,25 @@ public partial class MainWindowViewModel
         => rows.FirstOrDefault(r => r.DisciplineName.StartsWith(header, StringComparison.OrdinalIgnoreCase)
                                     && r.FacultyGroup.Equals(kind, StringComparison.OrdinalIgnoreCase))
                 ?.Total;
+
+    private static int SumHours(PlanRow row)
+        => (row.Lek ?? 0)
+           + (row.Pr ?? 0)
+           + (row.Lab ?? 0)
+           + (row.Ksr ?? 0)
+           + (row.Kp ?? 0)
+           + (row.Kr ?? 0)
+           + (row.KontrolRab ?? 0)
+           + (row.Zach ?? 0)
+           + (row.DifZach ?? 0)
+           + (row.Exz ?? 0)
+           + (row.GosExz ?? 0)
+           + (row.Gek ?? 0)
+           + (row.RukVkr ?? 0)
+           + (row.Rec ?? 0)
+           + (row.UchPr ?? 0)
+           + (row.PrPr ?? 0)
+           + (row.PredPr ?? 0);
 
     private void RefreshSummaryRows(SummaryTable summary)
     {

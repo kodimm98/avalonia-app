@@ -18,8 +18,6 @@ public class ExcelImportService
 
         foreach (var ws in wb.Worksheets)
         {
-            if (!ws.Name.StartsWith("Table", StringComparison.OrdinalIgnoreCase))
-                continue;
 
             var lastRow = ws.LastRowUsed()?.RowNumber() ?? 0;
             if (lastRow < 3) continue;
