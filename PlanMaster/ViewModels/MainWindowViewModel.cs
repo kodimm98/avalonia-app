@@ -18,6 +18,9 @@ public partial class MainWindowViewModel : ViewModelBase
     public const string MethodicalBaseCategory = "Совершенствование учебно-материальной базы";
     public const string OrganizationalResearchCategory = "Организация научно-исследовательской работы студентов";
     public const string ResearchWorkCategory = "Научно-исследовательская работа";
+    public const string QualificationCategory = "Повышение квалификации";
+    public const string ExtracurricularCategory = "Внеучебная работа";
+    public const string OtherWorkCategory = "Другие виды работ";
 
     private readonly ExcelImportService _importService = new();
     private readonly SummaryCalculator _summaryCalculator = new();
@@ -66,12 +69,18 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<MethodWorkRow> MethodicalBaseRows { get; } = new();
     public ObservableCollection<MethodWorkRow> OrganizationalResearchRows { get; } = new();
     public ObservableCollection<MethodWorkRow> ResearchWorkRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> QualificationRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> ExtracurricularRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> OtherWorkRows { get; } = new();
 
     [ObservableProperty] private MethodWorkRow? selectedMethodicalProcessRow;
     [ObservableProperty] private MethodWorkRow? selectedMethodicalPublishingRow;
     [ObservableProperty] private MethodWorkRow? selectedMethodicalBaseRow;
     [ObservableProperty] private MethodWorkRow? selectedOrganizationalResearchRow;
     [ObservableProperty] private MethodWorkRow? selectedResearchWorkRow;
+    [ObservableProperty] private MethodWorkRow? selectedQualificationRow;
+    [ObservableProperty] private MethodWorkRow? selectedExtracurricularRow;
+    [ObservableProperty] private MethodWorkRow? selectedOtherWorkRow;
 
     [ObservableProperty] private PlanTable? selectedTable;
     [ObservableProperty] private string statusText = "";
@@ -146,6 +155,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 
@@ -255,6 +266,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 

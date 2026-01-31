@@ -13,6 +13,9 @@ public partial class MainWindowViewModel
     public bool CanDeleteMethodicalBaseRow => SelectedMethodicalBaseRow != null;
     public bool CanDeleteOrganizationalResearchRow => SelectedOrganizationalResearchRow != null;
     public bool CanDeleteResearchWorkRow => SelectedResearchWorkRow != null;
+    public bool CanDeleteQualificationRow => SelectedQualificationRow != null;
+    public bool CanDeleteExtracurricularRow => SelectedExtracurricularRow != null;
+    public bool CanDeleteOtherWorkRow => SelectedOtherWorkRow != null;
 
     public void AddMethodicalProcessRow()
         => MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
@@ -28,6 +31,15 @@ public partial class MainWindowViewModel
 
     public void AddResearchWorkRow()
         => ResearchWorkRows.Add(new MethodWorkRow { Category = ResearchWorkCategory });
+
+    public void AddQualificationRow()
+        => QualificationRows.Add(new MethodWorkRow { Category = QualificationCategory });
+
+    public void AddExtracurricularRow()
+        => ExtracurricularRows.Add(new MethodWorkRow { Category = ExtracurricularCategory });
+
+    public void AddOtherWorkRow()
+        => OtherWorkRows.Add(new MethodWorkRow { Category = OtherWorkCategory });
 
     public void DeleteMethodicalProcessRow()
     {
@@ -67,6 +79,27 @@ public partial class MainWindowViewModel
         SelectedResearchWorkRow = null;
     }
 
+    public void DeleteQualificationRow()
+    {
+        if (SelectedQualificationRow == null) return;
+        QualificationRows.Remove(SelectedQualificationRow);
+        SelectedQualificationRow = null;
+    }
+
+    public void DeleteExtracurricularRow()
+    {
+        if (SelectedExtracurricularRow == null) return;
+        ExtracurricularRows.Remove(SelectedExtracurricularRow);
+        SelectedExtracurricularRow = null;
+    }
+
+    public void DeleteOtherWorkRow()
+    {
+        if (SelectedOtherWorkRow == null) return;
+        OtherWorkRows.Remove(SelectedOtherWorkRow);
+        SelectedOtherWorkRow = null;
+    }
+
     partial void OnSelectedMethodicalProcessRowChanged(MethodWorkRow? value)
         => OnPropertyChanged(nameof(CanDeleteMethodicalProcessRow));
 
@@ -82,6 +115,15 @@ public partial class MainWindowViewModel
     partial void OnSelectedResearchWorkRowChanged(MethodWorkRow? value)
         => OnPropertyChanged(nameof(CanDeleteResearchWorkRow));
 
+    partial void OnSelectedQualificationRowChanged(MethodWorkRow? value)
+        => OnPropertyChanged(nameof(CanDeleteQualificationRow));
+
+    partial void OnSelectedExtracurricularRowChanged(MethodWorkRow? value)
+        => OnPropertyChanged(nameof(CanDeleteExtracurricularRow));
+
+    partial void OnSelectedOtherWorkRowChanged(MethodWorkRow? value)
+        => OnPropertyChanged(nameof(CanDeleteOtherWorkRow));
+
     private void ResetMethodicalRows()
     {
         MethodicalProcessRows.Clear();
@@ -89,12 +131,18 @@ public partial class MainWindowViewModel
         MethodicalBaseRows.Clear();
         OrganizationalResearchRows.Clear();
         ResearchWorkRows.Clear();
+        QualificationRows.Clear();
+        ExtracurricularRows.Clear();
+        OtherWorkRows.Clear();
 
         MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
         MethodicalPublishingRows.Add(new MethodWorkRow { Category = MethodicalPublishingCategory });
         MethodicalBaseRows.Add(new MethodWorkRow { Category = MethodicalBaseCategory });
         OrganizationalResearchRows.Add(new MethodWorkRow { Category = OrganizationalResearchCategory });
         ResearchWorkRows.Add(new MethodWorkRow { Category = ResearchWorkCategory });
+        QualificationRows.Add(new MethodWorkRow { Category = QualificationCategory });
+        ExtracurricularRows.Add(new MethodWorkRow { Category = ExtracurricularCategory });
+        OtherWorkRows.Add(new MethodWorkRow { Category = OtherWorkCategory });
     }
 
     private void LoadMethodical(MethodWorkTable? table)
@@ -104,6 +152,9 @@ public partial class MainWindowViewModel
         MethodicalBaseRows.Clear();
         OrganizationalResearchRows.Clear();
         ResearchWorkRows.Clear();
+        QualificationRows.Clear();
+        ExtracurricularRows.Clear();
+        OtherWorkRows.Clear();
 
         if (table == null)
         {
@@ -120,6 +171,9 @@ public partial class MainWindowViewModel
                 MethodicalBaseCategory => MethodicalBaseRows,
                 OrganizationalResearchCategory => OrganizationalResearchRows,
                 ResearchWorkCategory => ResearchWorkRows,
+                QualificationCategory => QualificationRows,
+                ExtracurricularCategory => ExtracurricularRows,
+                OtherWorkCategory => OtherWorkRows,
                 _ => MethodicalProcessRows
             };
 
@@ -143,6 +197,12 @@ public partial class MainWindowViewModel
             OrganizationalResearchRows.Add(new MethodWorkRow { Category = OrganizationalResearchCategory });
         if (ResearchWorkRows.Count == 0)
             ResearchWorkRows.Add(new MethodWorkRow { Category = ResearchWorkCategory });
+        if (QualificationRows.Count == 0)
+            QualificationRows.Add(new MethodWorkRow { Category = QualificationCategory });
+        if (ExtracurricularRows.Count == 0)
+            ExtracurricularRows.Add(new MethodWorkRow { Category = ExtracurricularCategory });
+        if (OtherWorkRows.Count == 0)
+            OtherWorkRows.Add(new MethodWorkRow { Category = OtherWorkCategory });
     }
 
     private MethodWorkTable BuildMethodicalFromUi()
@@ -158,6 +218,9 @@ public partial class MainWindowViewModel
         AddRows(MethodicalBaseRows, MethodicalBaseCategory);
         AddRows(OrganizationalResearchRows, OrganizationalResearchCategory);
         AddRows(ResearchWorkRows, ResearchWorkCategory);
+        AddRows(QualificationRows, QualificationCategory);
+        AddRows(ExtracurricularRows, ExtracurricularCategory);
+        AddRows(OtherWorkRows, OtherWorkCategory);
 
         return table;
 
@@ -215,7 +278,12 @@ public partial class MainWindowViewModel
         {
             [MethodicalProcessCategory] = (0, 0),
             [MethodicalPublishingCategory] = (0, 0),
-            [MethodicalBaseCategory] = (0, 0)
+            [MethodicalBaseCategory] = (0, 0),
+            [OrganizationalResearchCategory] = (0, 0),
+            [ResearchWorkCategory] = (0, 0),
+            [QualificationCategory] = (0, 0),
+            [ExtracurricularCategory] = (0, 0),
+            [OtherWorkCategory] = (0, 0)
         };
 
         foreach (var row in methodical.Rows)
@@ -240,10 +308,25 @@ public partial class MainWindowViewModel
         SetMethodicalRow(row21, totals[MethodicalProcessCategory]);
         SetMethodicalRow(row22, totals[MethodicalPublishingCategory]);
         SetMethodicalRow(row23, totals[MethodicalBaseCategory]);
+
+        SetSummaryRow(summary, "4", totals[OrganizationalResearchCategory]);
+        SetSummaryRow(summary, "5", totals[ResearchWorkCategory]);
+        SetSummaryRow(summary, "6", totals[QualificationCategory]);
+        SetSummaryRow(summary, "7", totals[ExtracurricularCategory]);
+        SetSummaryRow(summary, "8", totals[OtherWorkCategory]);
     }
 
     private static void SetMethodicalRow(SummaryRow row, (int Sem1, int Sem2) totals)
     {
+        row.Sem1Plan = totals.Sem1;
+        row.Sem2Plan = totals.Sem2;
+        row.YearPlan = totals.Sem1 + totals.Sem2;
+    }
+
+    private static void SetSummaryRow(SummaryTable summary, string code, (int Sem1, int Sem2) totals)
+    {
+        var row = summary.Rows.FirstOrDefault(r => r.Code == code);
+        if (row == null) return;
         row.Sem1Plan = totals.Sem1;
         row.Sem2Plan = totals.Sem2;
         row.YearPlan = totals.Sem1 + totals.Sem2;

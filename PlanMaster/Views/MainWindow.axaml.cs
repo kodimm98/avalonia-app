@@ -196,4 +196,40 @@ private void ToggleLeft_Click(object? sender, Avalonia.Interactivity.RoutedEvent
         if (DataContext is MainWindowViewModel vm)
             vm.DeleteResearchWorkRow();
     }
+
+    private void AddQualificationRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddQualificationRow();
+    }
+
+    private void DeleteQualificationRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteQualificationRow();
+    }
+
+    private void AddExtracurricularRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddExtracurricularRow();
+    }
+
+    private void DeleteExtracurricularRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteExtracurricularRow();
+    }
+
+    private void AddOtherWorkRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddOtherWorkRow();
+    }
+
+    private void DeleteOtherWorkRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteOtherWorkRow();
+    }
 }
