@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using PlanMaster.Models;
@@ -12,6 +13,12 @@ namespace PlanMaster.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
+    public const string MethodicalProcessCategory = "Разработка методического обеспечения учебного процесса";
+    public const string MethodicalPublishingCategory = "Подготовка к изданию учебно-методических разработок";
+    public const string MethodicalBaseCategory = "Совершенствование учебно-материальной базы";
+    public const string OrganizationalResearchCategory = "Организация научно-исследовательской работы студентов";
+    public const string ResearchWorkCategory = "Научно-исследовательская работа";
+
     private readonly ExcelImportService _importService = new();
     private readonly SummaryCalculator _summaryCalculator = new();
     private readonly PlanRepository _repo;
@@ -45,6 +52,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         _reportService = new ReportService(TemplatePath);
 
+        ResetMethodicalRows();
+
         _ = RefreshPlansAsync();
     }
 
@@ -52,6 +61,17 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<PlanTable> Tables { get; } = new();
     public ObservableCollection<PlanRow> CurrentRows { get; } = new();
     public ObservableCollection<SummaryRow> SummaryRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> MethodicalProcessRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> MethodicalPublishingRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> MethodicalBaseRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> OrganizationalResearchRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> ResearchWorkRows { get; } = new();
+
+    [ObservableProperty] private MethodWorkRow? selectedMethodicalProcessRow;
+    [ObservableProperty] private MethodWorkRow? selectedMethodicalPublishingRow;
+    [ObservableProperty] private MethodWorkRow? selectedMethodicalBaseRow;
+    [ObservableProperty] private MethodWorkRow? selectedOrganizationalResearchRow;
+    [ObservableProperty] private MethodWorkRow? selectedResearchWorkRow;
 
     [ObservableProperty] private PlanTable? selectedTable;
     [ObservableProperty] private string statusText = "";
@@ -96,7 +116,8 @@ public partial class MainWindowViewModel : ViewModelBase
         foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
             SummaryRows.Add(r);
 
-        await _repo.SaveAllAsync(imported, summary);
+        ResetMethodicalRows();
+        await _repo.SaveAllAsync(imported, summary, BuildMethodicalFromUi());
 
         CurrentPlanId = null;
         PlanName = "";
@@ -111,7 +132,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         StatusText = "Загрузка из БД…";
 
-        var (tables, summary) = await _repo.LoadAllAsync();
+        var (tables, summary, methodical) = await _repo.LoadAllAsync();
 
         Tables.Clear();
         foreach (var t in tables.OrderBy(t => t.SheetName))
@@ -126,6 +147,8 @@ public partial class MainWindowViewModel : ViewModelBase
                 SummaryRows.Add(r);
         }
 
+        LoadMethodical(methodical);
+
         CurrentPlanId = null;
         PlanName = "";
 
@@ -139,14 +162,11 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         StatusText = "Сохранение…";
 
-        var summary = BuildSummaryFromUi();
-        var recalced = _summaryCalculator.CreateOrUpdate(summary, Tables.ToList());
+        var recalced = BuildRecalcedSummaryFromUi();
 
-        await _repo.SaveAllAsync(Tables.ToList(), recalced);
+        await _repo.SaveAllAsync(Tables.ToList(), recalced, BuildMethodicalFromUi());
 
-        SummaryRows.Clear();
-        foreach (var r in recalced.Rows.OrderBy(r => r.RowOrder))
-            SummaryRows.Add(r);
+        RefreshSummaryRows(recalced);
 
         StatusText = "Сохранено (черновик)";
     }
@@ -201,7 +221,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         StatusText = "Открытие плана…";
 
-        var (tables, summary) = await _repo.LoadPlanAsync(SelectedPlan.Id);
+        var (tables, summary, methodical) = await _repo.LoadPlanAsync(SelectedPlan.Id);
 
         Tables.Clear();
         foreach (var t in tables.OrderBy(t => t.SheetName))
@@ -215,6 +235,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         CurrentPlanId = SelectedPlan.Id;
         PlanName = SelectedPlan.Name;
@@ -231,13 +253,14 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         StatusText = "Сохранение как новый план…";
 
-        var summary = BuildSummaryFromUi();
-        var recalced = _summaryCalculator.CreateOrUpdate(summary, Tables.ToList());
+        var recalced = BuildRecalcedSummaryFromUi();
 
-        var newId = await _repo.SaveAsNewPlanAsync(PlanName, Tables.ToList(), recalced);
+        var newId = await _repo.SaveAsNewPlanAsync(PlanName, Tables.ToList(), recalced, BuildMethodicalFromUi());
 
         CurrentPlanId = newId;
         OnPropertyChanged(nameof(CanSaveCurrentPlan));
+
+        RefreshSummaryRows(recalced);
 
         await RefreshPlansAsync();
 
@@ -250,10 +273,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
         StatusText = "Сохранение изменений плана…";
 
-        var summary = BuildSummaryFromUi();
-        var recalced = _summaryCalculator.CreateOrUpdate(summary, Tables.ToList());
+        var recalced = BuildRecalcedSummaryFromUi();
 
-        await _repo.SavePlanAsync(CurrentPlanId.Value, PlanName, Tables.ToList(), recalced);
+        await _repo.SavePlanAsync(CurrentPlanId.Value, PlanName, Tables.ToList(), recalced, BuildMethodicalFromUi());
+
+        RefreshSummaryRows(recalced);
 
         await RefreshPlansAsync();
 
@@ -309,10 +333,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
             var outDocx = Path.Combine(ReportsDir, $"Отчет_{DateTime.Now:yyyyMMdd_HHmm}.docx");
 
+            var recalced = BuildRecalcedSummaryFromUi();
+            RefreshSummaryRows(recalced);
+
             _lastDocxPath = _reportService.GenerateDocx(
                 outDocx,
                 Tables.ToList(),
-                SummaryRows.ToList());
+                recalced.Rows.ToList());
 
             _lastPdfPath = null;
 

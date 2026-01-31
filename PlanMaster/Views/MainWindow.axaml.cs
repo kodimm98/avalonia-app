@@ -124,4 +124,76 @@ private void ToggleLeft_Click(object? sender, Avalonia.Interactivity.RoutedEvent
 
         w.Show();
     }
+
+    private void PlansMenu_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm) return;
+
+        var window = new PlansWindow
+        {
+            DataContext = vm
+        };
+
+        window.Show(this);
+    }
+
+    private void AddMethodicalProcessRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddMethodicalProcessRow();
+    }
+
+    private void DeleteMethodicalProcessRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteMethodicalProcessRow();
+    }
+
+    private void AddMethodicalPublishingRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddMethodicalPublishingRow();
+    }
+
+    private void DeleteMethodicalPublishingRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteMethodicalPublishingRow();
+    }
+
+    private void AddMethodicalBaseRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddMethodicalBaseRow();
+    }
+
+    private void DeleteMethodicalBaseRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteMethodicalBaseRow();
+    }
+
+    private void AddOrganizationalResearchRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddOrganizationalResearchRow();
+    }
+
+    private void DeleteOrganizationalResearchRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteOrganizationalResearchRow();
+    }
+
+    private void AddResearchWorkRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddResearchWorkRow();
+    }
+
+    private void DeleteResearchWorkRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteResearchWorkRow();
+    }
 }
