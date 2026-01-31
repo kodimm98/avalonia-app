@@ -113,6 +113,35 @@
       </WrapPanel>
     </Border>
 
+    <Border Grid.Row="1" Background="#F3F3F3" BorderBrush="#BFC3C8" BorderThickness="0,0,0,1" Padding="10,6">
+      <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+        <Button Content="Архив планов" Click="PlansMenu_Click"/>
+        <Button Content="{Binding ToggleLeftTitle}" Click="ToggleLeft_Click"/>
+        <Button Content="Импорт Excel…" Click="ImportExcel_Click"/>
+        <Button Content="Сохранить" Click="SaveDb_Click"/>
+        <Button Content="Открыть в окне" Click="OpenInWindow_Click"/>
+
+        <DropDownButton Content="Работа с планом"
+                        Classes="reportBtn">
+          <DropDownButton.Flyout>
+            <MenuFlyout>
+              <MenuFlyout.FlyoutPresenterClasses>
+                <x:String>reportFlyout</x:String>
+              </MenuFlyout.FlyoutPresenterClasses>
+
+              <MenuItem Header="DOCX — сгенерировать" Click="ReportDocx_Click"/>
+              <MenuItem Header="DOCX — открыть" Click="OpenLastDocx_Click"/>
+              <MenuItem Header="DOCX — печать" Click="PrintLastDocx_Click"/>
+              <Separator/>
+              <MenuItem Header="PDF — сгенерировать" Click="ReportPdf_Click"/>
+              <MenuItem Header="PDF — просмотр" Click="OpenLastPdf_Click"/>
+              <MenuItem Header="PDF — печать" Click="PrintLastPdf_Click"/>
+            </MenuFlyout>
+          </DropDownButton.Flyout>
+        </DropDownButton>
+      </WrapPanel>
+    </Border>
+
     <!-- CONTENT -->
     <Grid Grid.Row="2" Margin="12">
 
