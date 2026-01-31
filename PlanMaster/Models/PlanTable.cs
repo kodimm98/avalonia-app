@@ -18,4 +18,7 @@ public class PlanTable
     public int? YearFact { get; set; }
 
     public List<PlanRow> Rows { get; set; } = new();
+
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+    public bool IncludeInSummary { get; set; } = true;
 }

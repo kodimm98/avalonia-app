@@ -124,4 +124,124 @@ private void ToggleLeft_Click(object? sender, Avalonia.Interactivity.RoutedEvent
 
         w.Show();
     }
+
+    private void PlansMenu_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm) return;
+
+        var window = new PlansWindow
+        {
+            DataContext = vm
+        };
+
+        window.Show(this);
+    }
+
+    private void TeachingCellEditEnded(object? sender, Avalonia.Controls.DataGridCellEditEndedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.RecalculateTableTotals(vm.SelectedTable);
+    }
+
+    private void TableInclude_Checked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.RecalculateSummaryFromTables();
+    }
+
+    private void AddMethodicalProcessRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddMethodicalProcessRow();
+    }
+
+    private void DeleteMethodicalProcessRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteMethodicalProcessRow();
+    }
+
+    private void AddMethodicalPublishingRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddMethodicalPublishingRow();
+    }
+
+    private void DeleteMethodicalPublishingRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteMethodicalPublishingRow();
+    }
+
+    private void AddMethodicalBaseRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddMethodicalBaseRow();
+    }
+
+    private void DeleteMethodicalBaseRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteMethodicalBaseRow();
+    }
+
+    private void AddOrganizationalResearchRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddOrganizationalResearchRow();
+    }
+
+    private void DeleteOrganizationalResearchRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteOrganizationalResearchRow();
+    }
+
+    private void AddResearchWorkRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddResearchWorkRow();
+    }
+
+    private void DeleteResearchWorkRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteResearchWorkRow();
+    }
+
+    private void AddQualificationRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddQualificationRow();
+    }
+
+    private void DeleteQualificationRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteQualificationRow();
+    }
+
+    private void AddExtracurricularRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddExtracurricularRow();
+    }
+
+    private void DeleteExtracurricularRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteExtracurricularRow();
+    }
+
+    private void AddOtherWorkRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.AddOtherWorkRow();
+    }
+
+    private void DeleteOtherWorkRow_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.DeleteOtherWorkRow();
+    }
 }
