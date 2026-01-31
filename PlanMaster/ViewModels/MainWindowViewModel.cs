@@ -16,6 +16,8 @@ public partial class MainWindowViewModel : ViewModelBase
     public const string MethodicalProcessCategory = "Разработка методического обеспечения учебного процесса";
     public const string MethodicalPublishingCategory = "Подготовка к изданию учебно-методических разработок";
     public const string MethodicalBaseCategory = "Совершенствование учебно-материальной базы";
+    public const string OrganizationalResearchCategory = "Организация научно-исследовательской работы студентов";
+    public const string ResearchWorkCategory = "Научно-исследовательская работа";
 
     private readonly ExcelImportService _importService = new();
     private readonly SummaryCalculator _summaryCalculator = new();
@@ -62,10 +64,14 @@ public partial class MainWindowViewModel : ViewModelBase
     public ObservableCollection<MethodWorkRow> MethodicalProcessRows { get; } = new();
     public ObservableCollection<MethodWorkRow> MethodicalPublishingRows { get; } = new();
     public ObservableCollection<MethodWorkRow> MethodicalBaseRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> OrganizationalResearchRows { get; } = new();
+    public ObservableCollection<MethodWorkRow> ResearchWorkRows { get; } = new();
 
     [ObservableProperty] private MethodWorkRow? selectedMethodicalProcessRow;
     [ObservableProperty] private MethodWorkRow? selectedMethodicalPublishingRow;
     [ObservableProperty] private MethodWorkRow? selectedMethodicalBaseRow;
+    [ObservableProperty] private MethodWorkRow? selectedOrganizationalResearchRow;
+    [ObservableProperty] private MethodWorkRow? selectedResearchWorkRow;
 
     [ObservableProperty] private PlanTable? selectedTable;
     [ObservableProperty] private string statusText = "";
@@ -140,6 +146,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 
@@ -247,6 +255,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 

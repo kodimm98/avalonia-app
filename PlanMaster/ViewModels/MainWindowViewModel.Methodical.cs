@@ -11,6 +11,8 @@ public partial class MainWindowViewModel
     public bool CanDeleteMethodicalProcessRow => SelectedMethodicalProcessRow != null;
     public bool CanDeleteMethodicalPublishingRow => SelectedMethodicalPublishingRow != null;
     public bool CanDeleteMethodicalBaseRow => SelectedMethodicalBaseRow != null;
+    public bool CanDeleteOrganizationalResearchRow => SelectedOrganizationalResearchRow != null;
+    public bool CanDeleteResearchWorkRow => SelectedResearchWorkRow != null;
 
     public void AddMethodicalProcessRow()
         => MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
@@ -20,6 +22,12 @@ public partial class MainWindowViewModel
 
     public void AddMethodicalBaseRow()
         => MethodicalBaseRows.Add(new MethodWorkRow { Category = MethodicalBaseCategory });
+
+    public void AddOrganizationalResearchRow()
+        => OrganizationalResearchRows.Add(new MethodWorkRow { Category = OrganizationalResearchCategory });
+
+    public void AddResearchWorkRow()
+        => ResearchWorkRows.Add(new MethodWorkRow { Category = ResearchWorkCategory });
 
     public void DeleteMethodicalProcessRow()
     {
@@ -45,6 +53,20 @@ public partial class MainWindowViewModel
         RefreshSummaryRows(BuildRecalcedSummaryFromUi());
     }
 
+    public void DeleteOrganizationalResearchRow()
+    {
+        if (SelectedOrganizationalResearchRow == null) return;
+        OrganizationalResearchRows.Remove(SelectedOrganizationalResearchRow);
+        SelectedOrganizationalResearchRow = null;
+    }
+
+    public void DeleteResearchWorkRow()
+    {
+        if (SelectedResearchWorkRow == null) return;
+        ResearchWorkRows.Remove(SelectedResearchWorkRow);
+        SelectedResearchWorkRow = null;
+    }
+
     partial void OnSelectedMethodicalProcessRowChanged(MethodWorkRow? value)
         => OnPropertyChanged(nameof(CanDeleteMethodicalProcessRow));
 
@@ -54,15 +76,25 @@ public partial class MainWindowViewModel
     partial void OnSelectedMethodicalBaseRowChanged(MethodWorkRow? value)
         => OnPropertyChanged(nameof(CanDeleteMethodicalBaseRow));
 
+    partial void OnSelectedOrganizationalResearchRowChanged(MethodWorkRow? value)
+        => OnPropertyChanged(nameof(CanDeleteOrganizationalResearchRow));
+
+    partial void OnSelectedResearchWorkRowChanged(MethodWorkRow? value)
+        => OnPropertyChanged(nameof(CanDeleteResearchWorkRow));
+
     private void ResetMethodicalRows()
     {
         MethodicalProcessRows.Clear();
         MethodicalPublishingRows.Clear();
         MethodicalBaseRows.Clear();
+        OrganizationalResearchRows.Clear();
+        ResearchWorkRows.Clear();
 
         MethodicalProcessRows.Add(new MethodWorkRow { Category = MethodicalProcessCategory });
         MethodicalPublishingRows.Add(new MethodWorkRow { Category = MethodicalPublishingCategory });
         MethodicalBaseRows.Add(new MethodWorkRow { Category = MethodicalBaseCategory });
+        OrganizationalResearchRows.Add(new MethodWorkRow { Category = OrganizationalResearchCategory });
+        ResearchWorkRows.Add(new MethodWorkRow { Category = ResearchWorkCategory });
     }
 
     private void LoadMethodical(MethodWorkTable? table)
@@ -70,6 +102,8 @@ public partial class MainWindowViewModel
         MethodicalProcessRows.Clear();
         MethodicalPublishingRows.Clear();
         MethodicalBaseRows.Clear();
+        OrganizationalResearchRows.Clear();
+        ResearchWorkRows.Clear();
 
         if (table == null)
         {
@@ -84,6 +118,8 @@ public partial class MainWindowViewModel
                 MethodicalProcessCategory => MethodicalProcessRows,
                 MethodicalPublishingCategory => MethodicalPublishingRows,
                 MethodicalBaseCategory => MethodicalBaseRows,
+                OrganizationalResearchCategory => OrganizationalResearchRows,
+                ResearchWorkCategory => ResearchWorkRows,
                 _ => MethodicalProcessRows
             };
 
@@ -103,6 +139,10 @@ public partial class MainWindowViewModel
             MethodicalPublishingRows.Add(new MethodWorkRow { Category = MethodicalPublishingCategory });
         if (MethodicalBaseRows.Count == 0)
             MethodicalBaseRows.Add(new MethodWorkRow { Category = MethodicalBaseCategory });
+        if (OrganizationalResearchRows.Count == 0)
+            OrganizationalResearchRows.Add(new MethodWorkRow { Category = OrganizationalResearchCategory });
+        if (ResearchWorkRows.Count == 0)
+            ResearchWorkRows.Add(new MethodWorkRow { Category = ResearchWorkCategory });
     }
 
     private MethodWorkTable BuildMethodicalFromUi()
@@ -116,6 +156,8 @@ public partial class MainWindowViewModel
         AddRows(MethodicalProcessRows, MethodicalProcessCategory);
         AddRows(MethodicalPublishingRows, MethodicalPublishingCategory);
         AddRows(MethodicalBaseRows, MethodicalBaseCategory);
+        AddRows(OrganizationalResearchRows, OrganizationalResearchCategory);
+        AddRows(ResearchWorkRows, ResearchWorkCategory);
 
         return table;
 
