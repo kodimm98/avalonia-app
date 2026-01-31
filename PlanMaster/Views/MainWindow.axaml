@@ -28,99 +28,93 @@
 
     <!-- Кнопка "Отчёт" в шапке -->
     <Style Selector="DropDownButton.reportBtn">
-      <Setter Property="Foreground" Value="White"/>
-      <Setter Property="Background" Value="#26303D"/>
-      <Setter Property="Padding" Value="12,8"/>
-      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Foreground" Value="#1A1A1A"/>
+      <Setter Property="Background" Value="#F0F0F0"/>
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="CornerRadius" Value="2"/>
+      <Setter Property="BorderBrush" Value="#C0C0C0"/>
+      <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
     <Style Selector="DropDownButton.reportBtn:pointerover">
-      <Setter Property="Background" Value="#2F89FF"/>
-      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Background" Value="#E5E5E5"/>
+      <Setter Property="Foreground" Value="#1A1A1A"/>
     </Style>
 
     <!-- Выпадающее меню (только то, которое помечено классом reportFlyout) -->
     <Style Selector="MenuFlyoutPresenter.reportFlyout">
-      <Setter Property="Background" Value="#1B1F26"/>
-      <Setter Property="BorderBrush" Value="#3c4552"/>
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="BorderBrush" Value="#BFC3C8"/>
       <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="CornerRadius" Value="2"/>
       <Setter Property="Padding" Value="6"/>
     </Style>
 
     <Style Selector="MenuFlyoutPresenter.reportFlyout MenuItem">
-      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Foreground" Value="#1A1A1A"/>
       <Setter Property="Background" Value="Transparent"/>
       <Setter Property="Padding" Value="12,8"/>
     </Style>
 
     <Style Selector="MenuFlyoutPresenter.reportFlyout MenuItem:pointerover">
-      <Setter Property="Background" Value="#2F89FF"/>
-      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Background" Value="#E6E8EC"/>
+      <Setter Property="Foreground" Value="#1A1A1A"/>
     </Style>
 
     <Style Selector="MenuFlyoutPresenter.reportFlyout Separator">
-      <Setter Property="Background" Value="#2A3442"/>
+      <Setter Property="Background" Value="#E3E6EA"/>
       <Setter Property="Margin" Value="6,4"/>
     </Style>
 
   </Window.Styles>
 
 
-  <Grid Background="#F6F7F9" RowDefinitions="Auto,*">
+  <Grid Background="#DCDCDC" RowDefinitions="Auto,Auto,*">
 
     <!-- TOP BAR -->
-    <Border Background="#1B1F26" Padding="14,10">
+    <Border Background="#E6E6E6" Padding="10,8">
       <DockPanel LastChildFill="True">
 
         <!-- left title -->
         <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Spacing="2">
-          <TextBlock Text="PlanMaster" Foreground="White" FontSize="18" FontWeight="SemiBold"/>
-          <TextBlock Text="{Binding StatusText}" Foreground="#C9CED6" FontSize="12"/>
-        </StackPanel>
-
-        <!-- buttons row -->
-        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8">
-
-          <!-- ВАЖНО: Click — это обработчик (НЕ биндинг) -->
-          <Button Content="{Binding ToggleLeftTitle}" Click="ToggleLeft_Click"/>
-
-          <Button Content="Импорт Excel…" Click="ImportExcel_Click"/>
-          <Button Content="Загрузить из БД" Click="LoadDb_Click"/>
-          <Button Content="Сохранить" Click="SaveDb_Click"/>
-          <Button Content="Открыть в окне" Click="OpenInWindow_Click"/>
-
-          <!-- Report dropdown -->
-<!-- Report dropdown -->
-          <!-- Report dropdown -->
-          <DropDownButton Content="Отчёт"
-                          Classes="reportBtn">
-            <DropDownButton.Flyout>
-              <MenuFlyout>
-                <MenuFlyout.FlyoutPresenterClasses>
-                  <x:String>reportFlyout</x:String>
-                </MenuFlyout.FlyoutPresenterClasses>
-
-                <MenuItem Header="DOCX — сгенерировать" Click="ReportDocx_Click"/>
-                <MenuItem Header="DOCX — открыть" Click="OpenLastDocx_Click"/>
-                <MenuItem Header="DOCX — печать" Click="PrintLastDocx_Click"/>
-                <Separator/>
-                <MenuItem Header="PDF — сгенерировать" Click="ReportPdf_Click"/>
-                <MenuItem Header="PDF — просмотр" Click="OpenLastPdf_Click"/>
-                <MenuItem Header="PDF — печать" Click="PrintLastPdf_Click"/>
-              </MenuFlyout>
-            </DropDownButton.Flyout>
-          </DropDownButton>
-
-
-
+          <TextBlock Text="PlanMaster" Foreground="#1A1A1A" FontSize="18" FontWeight="SemiBold"/>
+          <TextBlock Text="{Binding StatusText}" Foreground="#5A5A5A" FontSize="12"/>
         </StackPanel>
 
       </DockPanel>
     </Border>
 
+    <Border Grid.Row="1" Background="#F3F3F3" BorderBrush="#BFC3C8" BorderThickness="0,0,0,1" Padding="10,6">
+      <WrapPanel Orientation="Horizontal" ItemSpacing="8" LineSpacing="8">
+        <Button Content="Архив планов" Click="PlansMenu_Click"/>
+        <Button Content="{Binding ToggleLeftTitle}" Click="ToggleLeft_Click"/>
+        <Button Content="Импорт Excel…" Click="ImportExcel_Click"/>
+        <Button Content="Сохранить" Click="SaveDb_Click"/>
+        <Button Content="Открыть в окне" Click="OpenInWindow_Click"/>
+
+        <DropDownButton Content="Работа с планом"
+                        Classes="reportBtn">
+          <DropDownButton.Flyout>
+            <MenuFlyout>
+              <MenuFlyout.FlyoutPresenterClasses>
+                <x:String>reportFlyout</x:String>
+              </MenuFlyout.FlyoutPresenterClasses>
+
+              <MenuItem Header="DOCX — сгенерировать" Click="ReportDocx_Click"/>
+              <MenuItem Header="DOCX — открыть" Click="OpenLastDocx_Click"/>
+              <MenuItem Header="DOCX — печать" Click="PrintLastDocx_Click"/>
+              <Separator/>
+              <MenuItem Header="PDF — сгенерировать" Click="ReportPdf_Click"/>
+              <MenuItem Header="PDF — просмотр" Click="OpenLastPdf_Click"/>
+              <MenuItem Header="PDF — печать" Click="PrintLastPdf_Click"/>
+            </MenuFlyout>
+          </DropDownButton.Flyout>
+        </DropDownButton>
+      </WrapPanel>
+    </Border>
+
     <!-- CONTENT -->
-    <Grid Grid.Row="1" Margin="12">
+    <Grid Grid.Row="2" Margin="12">
 
       <!-- НЕЛЬЗЯ биндингом задавать ColumnDefinitions строкой.
            Нужно задавать ColumnDefinition и биндингить Width. -->
@@ -133,9 +127,9 @@
       <!-- LEFT -->
       <Border Grid.Column="0"
               Padding="12"
-              CornerRadius="14"
+              CornerRadius="2"
               Background="White"
-              BorderBrush="#E3E6EA"
+              BorderBrush="#BFC3C8"
               BorderThickness="1"
               IsVisible="{Binding IsLeftShown}">
 
@@ -152,8 +146,8 @@
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="models:PlanTable">
                 <Border Padding="10"
-                        CornerRadius="10"
-                        BorderBrush="#EEF0F3"
+                        CornerRadius="2"
+                        BorderBrush="#D5D5D5"
                         BorderThickness="1"
                         Background="Transparent">
                   <StackPanel>
@@ -174,21 +168,21 @@
       <!-- splitter -->
       <GridSplitter Grid.Column="1"
                     Width="6"
-                    Background="#E7EAF0"
+                    Background="#CFCFCF"
                     IsVisible="{Binding IsLeftShown}"/>
 
       <!-- RIGHT -->
       <Border Grid.Column="2"
               Padding="12"
-              CornerRadius="14"
+              CornerRadius="2"
               Background="White"
-              BorderBrush="#E3E6EA"
+              BorderBrush="#BFC3C8"
               BorderThickness="1">
 
         <TabControl>
 
           <!-- 1) DISCIPLINES -->
-          <TabItem Header="Дисциплины (с итогами)">
+          <TabItem Header="Учебная нагрузка">
             <Grid RowDefinitions="Auto,*" RowSpacing="10">
 
               <DockPanel Grid.Row="0" LastChildFill="True">
@@ -197,19 +191,20 @@
                            FontWeight="SemiBold"
                            DockPanel.Dock="Left"/>
 
-                <TextBlock Text="Итоги внизу как в Excel: Итого → Поручено/Выполнено"
-                           DockPanel.Dock="Right"
-                           Opacity="0.6"/>
+                
               </DockPanel>
 
               <dg:DataGrid Grid.Row="1"
                            ItemsSource="{Binding CurrentRows}"
                            AutoGenerateColumns="False"
                            IsReadOnly="False"
+                           CanUserSortColumns="False"
                            GridLinesVisibility="All"
                            FontSize="12"
-                           RowHeight="26"
-                           ColumnHeaderHeight="30"
+                           RowHeight="22"
+                           ColumnHeaderHeight="26"
+                           HorizontalAlignment="Left"
+                           MaxWidth="1280"
                            HorizontalScrollBarVisibility="Auto"
                            VerticalScrollBarVisibility="Auto">
 
@@ -227,7 +222,7 @@
 
                   <!-- Базовые -->
                   <dg:DataGridTextColumn Header="№" Binding="{Binding Number}" Width="50"/>
-                  <dg:DataGridTextColumn Header="Наименование дисциплины / Итого" Binding="{Binding DisciplineName}" Width="320"/>
+                  <dg:DataGridTextColumn Header="Наименование дисциплины" Binding="{Binding DisciplineName}" Width="320"/>
                   <dg:DataGridTextColumn Header="Факультет, спец., группа / Поручено/Вып." Binding="{Binding FacultyGroup}" Width="240"/>
 
                   <!-- Количество -->
@@ -265,7 +260,7 @@
           </TabItem>
 
           <!-- 2) SUMMARY -->
-          <TabItem Header="Итоговая таблица (для отчёта)">
+          <TabItem Header="Итоговая таблица">
             <dg:DataGrid ItemsSource="{Binding SummaryRows}"
                          AutoGenerateColumns="False"
                          IsReadOnly="False"
@@ -285,66 +280,283 @@
             </dg:DataGrid>
           </TabItem>
 
-          <!-- 3) PLANS -->
-          <TabItem Header="Планы">
-            <Grid ColumnDefinitions="320,*"
-                  RowDefinitions="Auto,*"
-                  RowSpacing="10"
-                  ColumnSpacing="10">
+          <!-- 3) METHODICAL -->
+          <TabItem Header="Прочая нагрузка">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <StackPanel Spacing="12">
 
-              <StackPanel Grid.ColumnSpan="2"
-                          Orientation="Horizontal"
-                          Spacing="8">
-                <TextBlock Text="Название:"
-                           VerticalAlignment="Center"
-                           Opacity="0.7"/>
-                <TextBox Width="360"
-                         Text="{Binding PlanName}"/>
-                <Button Content="Сохранить как новый план"
-                        Click="SaveAsNewPlan_Click"/>
-                <Button Content="Сохранить изменения"
-                        Click="SaveCurrentPlan_Click"
-                        IsEnabled="{Binding CanSaveCurrentPlan}"/>
-                <Button Content="Обновить список"
-                        Click="RefreshPlans_Click"/>
-                <Button Content="Удалить план"
-                        Click="DeletePlan_Click"/>
-              </StackPanel>
+                <Expander Header="Учебно-методическая нагрузка" IsExpanded="True">
+                  <StackPanel Spacing="12" Margin="0,6,0,0">
 
-              <ListBox Grid.Row="1"
-                       Grid.Column="0"
-                       ItemsSource="{Binding Plans}"
-                       SelectedItem="{Binding SelectedPlan}">
-                <ListBox.ItemTemplate>
-                  <DataTemplate>
-                    <StackPanel Margin="6">
-                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-                      <TextBlock Text="{Binding UpdatedAtUtc}" Opacity="0.6" FontSize="12"/>
+                    <Expander Header="Разработка методического обеспечения учебного процесса" IsExpanded="True">
+                      <StackPanel Spacing="6" Margin="0,6,0,0">
+                        <dg:DataGrid ItemsSource="{Binding MethodicalProcessRows}"
+                                     AutoGenerateColumns="False"
+                                     IsReadOnly="False"
+                                     SelectedItem="{Binding SelectedMethodicalProcessRow}"
+                                     GridLinesVisibility="All"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     VerticalScrollBarVisibility="Auto"
+                                     RowHeight="26"
+                                     ColumnHeaderHeight="30">
+                          <dg:DataGrid.Columns>
+                            <dg:DataGridTextColumn Header="Наименование работ" Binding="{Binding WorkName}" Width="*"/>
+                            <dg:DataGridTextColumn Header="Затраты времени (час.)" Binding="{Binding TimeHours}" Width="160"/>
+                            <dg:DataGridTextColumn Header="Сроки исполнения" Binding="{Binding Deadline}" Width="200"/>
+                            <dg:DataGridTextColumn Header="Отметка об исполнении" Binding="{Binding CompletionNote}" Width="200"/>
+                          </dg:DataGrid.Columns>
+                        </dg:DataGrid>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Spacing="6"
+                                    Margin="0,6,0,0">
+                          <Button Content="Добавить строку"
+                                  Width="160"
+                                  Click="AddMethodicalProcessRow_Click"/>
+                          <Button Content="Удалить строку"
+                                  Width="160"
+                                  IsEnabled="{Binding CanDeleteMethodicalProcessRow}"
+                                  Click="DeleteMethodicalProcessRow_Click"/>
+                        </StackPanel>
+                      </StackPanel>
+                    </Expander>
+
+                    <Expander Header="Подготовка к изданию учебно-методических разработок">
+                      <StackPanel Spacing="6" Margin="0,6,0,0">
+                        <dg:DataGrid ItemsSource="{Binding MethodicalPublishingRows}"
+                                     AutoGenerateColumns="False"
+                                     IsReadOnly="False"
+                                     SelectedItem="{Binding SelectedMethodicalPublishingRow}"
+                                     GridLinesVisibility="All"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     VerticalScrollBarVisibility="Auto"
+                                     RowHeight="26"
+                                     ColumnHeaderHeight="30">
+                          <dg:DataGrid.Columns>
+                            <dg:DataGridTextColumn Header="Наименование работ" Binding="{Binding WorkName}" Width="*"/>
+                            <dg:DataGridTextColumn Header="Затраты времени (час.)" Binding="{Binding TimeHours}" Width="160"/>
+                            <dg:DataGridTextColumn Header="Сроки исполнения" Binding="{Binding Deadline}" Width="200"/>
+                            <dg:DataGridTextColumn Header="Отметка об исполнении" Binding="{Binding CompletionNote}" Width="200"/>
+                          </dg:DataGrid.Columns>
+                        </dg:DataGrid>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Spacing="6"
+                                    Margin="0,6,0,0">
+                          <Button Content="Добавить строку"
+                                  Width="160"
+                                  Click="AddMethodicalPublishingRow_Click"/>
+                          <Button Content="Удалить строку"
+                                  Width="160"
+                                  IsEnabled="{Binding CanDeleteMethodicalPublishingRow}"
+                                  Click="DeleteMethodicalPublishingRow_Click"/>
+                        </StackPanel>
+                      </StackPanel>
+                    </Expander>
+
+                    <Expander Header="Совершенствование учебно-материальной базы">
+                      <StackPanel Spacing="6" Margin="0,6,0,0">
+                        <dg:DataGrid ItemsSource="{Binding MethodicalBaseRows}"
+                                     AutoGenerateColumns="False"
+                                     IsReadOnly="False"
+                                     SelectedItem="{Binding SelectedMethodicalBaseRow}"
+                                     GridLinesVisibility="All"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     VerticalScrollBarVisibility="Auto"
+                                     RowHeight="26"
+                                     ColumnHeaderHeight="30">
+                          <dg:DataGrid.Columns>
+                            <dg:DataGridTextColumn Header="Наименование работ" Binding="{Binding WorkName}" Width="*"/>
+                            <dg:DataGridTextColumn Header="Затраты времени (час.)" Binding="{Binding TimeHours}" Width="160"/>
+                            <dg:DataGridTextColumn Header="Сроки исполнения" Binding="{Binding Deadline}" Width="200"/>
+                            <dg:DataGridTextColumn Header="Отметка об исполнении" Binding="{Binding CompletionNote}" Width="200"/>
+                          </dg:DataGrid.Columns>
+                        </dg:DataGrid>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Spacing="6"
+                                    Margin="0,6,0,0">
+                          <Button Content="Добавить строку"
+                                  Width="160"
+                                  Click="AddMethodicalBaseRow_Click"/>
+                          <Button Content="Удалить строку"
+                                  Width="160"
+                                  IsEnabled="{Binding CanDeleteMethodicalBaseRow}"
+                                  Click="DeleteMethodicalBaseRow_Click"/>
+                        </StackPanel>
+                      </StackPanel>
+                    </Expander>
+
+                  </StackPanel>
+                </Expander>
+
+                <Expander Header="Организация научно-исследовательской работы студентов">
+                  <StackPanel Spacing="6" Margin="0,6,0,0">
+                    <dg:DataGrid ItemsSource="{Binding OrganizationalResearchRows}"
+                                 AutoGenerateColumns="False"
+                                 IsReadOnly="False"
+                                 SelectedItem="{Binding SelectedOrganizationalResearchRow}"
+                                 GridLinesVisibility="All"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 VerticalScrollBarVisibility="Auto"
+                                 RowHeight="26"
+                                 ColumnHeaderHeight="30">
+                      <dg:DataGrid.Columns>
+                        <dg:DataGridTextColumn Header="Наименование работ" Binding="{Binding WorkName}" Width="*"/>
+                        <dg:DataGridTextColumn Header="Затраты времени (час.)" Binding="{Binding TimeHours}" Width="160"/>
+                        <dg:DataGridTextColumn Header="Сроки исполнения" Binding="{Binding Deadline}" Width="200"/>
+                        <dg:DataGridTextColumn Header="Отметка об исполнении" Binding="{Binding CompletionNote}" Width="200"/>
+                      </dg:DataGrid.Columns>
+                    </dg:DataGrid>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Spacing="6"
+                                Margin="0,6,0,0">
+                      <Button Content="Добавить строку"
+                              Width="160"
+                              Click="AddOrganizationalResearchRow_Click"/>
+                      <Button Content="Удалить строку"
+                              Width="160"
+                              IsEnabled="{Binding CanDeleteOrganizationalResearchRow}"
+                              Click="DeleteOrganizationalResearchRow_Click"/>
                     </StackPanel>
-                  </DataTemplate>
-                </ListBox.ItemTemplate>
-              </ListBox>
+                  </StackPanel>
+                </Expander>
 
-              <Border Grid.Row="1"
-                      Grid.Column="1"
-                      Padding="12"
-                      Background="#FAFAFB"
-                      BorderBrush="#E3E6EA"
-                      BorderThickness="1">
-                <StackPanel Spacing="8">
-                  <TextBlock Text="Открытие плана"
-                             FontWeight="SemiBold"/>
-                  <TextBlock Text="Выберите план слева и нажмите 'Открыть'."
-                             Opacity="0.7"/>
-                  <Button Content="Открыть выбранный план"
-                          Click="OpenPlan_Click"
-                          Width="220"/>
-                  <TextBlock Text="После открытия редактируйте таблицы во вкладках 'Дисциплины/Итоги' и сохраняйте здесь."
-                             Opacity="0.7"/>
-                </StackPanel>
-              </Border>
+                <Expander Header="Научно-исследовательская работа">
+                  <StackPanel Spacing="6" Margin="0,6,0,0">
+                    <dg:DataGrid ItemsSource="{Binding ResearchWorkRows}"
+                                 AutoGenerateColumns="False"
+                                 IsReadOnly="False"
+                                 SelectedItem="{Binding SelectedResearchWorkRow}"
+                                 GridLinesVisibility="All"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 VerticalScrollBarVisibility="Auto"
+                                 RowHeight="26"
+                                 ColumnHeaderHeight="30">
+                      <dg:DataGrid.Columns>
+                        <dg:DataGridTextColumn Header="Наименование работ" Binding="{Binding WorkName}" Width="*"/>
+                        <dg:DataGridTextColumn Header="Затраты времени (час.)" Binding="{Binding TimeHours}" Width="160"/>
+                        <dg:DataGridTextColumn Header="Сроки исполнения" Binding="{Binding Deadline}" Width="200"/>
+                        <dg:DataGridTextColumn Header="Отметка об исполнении" Binding="{Binding CompletionNote}" Width="200"/>
+                      </dg:DataGrid.Columns>
+                    </dg:DataGrid>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Spacing="6"
+                                Margin="0,6,0,0">
+                      <Button Content="Добавить строку"
+                              Width="160"
+                              Click="AddResearchWorkRow_Click"/>
+                      <Button Content="Удалить строку"
+                              Width="160"
+                              IsEnabled="{Binding CanDeleteResearchWorkRow}"
+                              Click="DeleteResearchWorkRow_Click"/>
+                    </StackPanel>
+                  </StackPanel>
+                </Expander>
 
-            </Grid>
+                <Expander Header="Повышение квалификации">
+                  <StackPanel Spacing="6" Margin="0,6,0,0">
+                    <dg:DataGrid ItemsSource="{Binding QualificationRows}"
+                                 AutoGenerateColumns="False"
+                                 IsReadOnly="False"
+                                 SelectedItem="{Binding SelectedQualificationRow}"
+                                 GridLinesVisibility="All"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 VerticalScrollBarVisibility="Auto"
+                                 RowHeight="26"
+                                 ColumnHeaderHeight="30">
+                      <dg:DataGrid.Columns>
+                        <dg:DataGridTextColumn Header="Наименование работ" Binding="{Binding WorkName}" Width="*"/>
+                        <dg:DataGridTextColumn Header="Затраты времени (час.)" Binding="{Binding TimeHours}" Width="160"/>
+                        <dg:DataGridTextColumn Header="Сроки исполнения" Binding="{Binding Deadline}" Width="200"/>
+                        <dg:DataGridTextColumn Header="Отметка об исполнении" Binding="{Binding CompletionNote}" Width="200"/>
+                      </dg:DataGrid.Columns>
+                    </dg:DataGrid>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Spacing="6"
+                                Margin="0,6,0,0">
+                      <Button Content="Добавить строку"
+                              Width="160"
+                              Click="AddQualificationRow_Click"/>
+                      <Button Content="Удалить строку"
+                              Width="160"
+                              IsEnabled="{Binding CanDeleteQualificationRow}"
+                              Click="DeleteQualificationRow_Click"/>
+                    </StackPanel>
+                  </StackPanel>
+                </Expander>
+
+                <Expander Header="Внеучебная работа">
+                  <StackPanel Spacing="6" Margin="0,6,0,0">
+                    <dg:DataGrid ItemsSource="{Binding ExtracurricularRows}"
+                                 AutoGenerateColumns="False"
+                                 IsReadOnly="False"
+                                 SelectedItem="{Binding SelectedExtracurricularRow}"
+                                 GridLinesVisibility="All"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 VerticalScrollBarVisibility="Auto"
+                                 RowHeight="26"
+                                 ColumnHeaderHeight="30">
+                      <dg:DataGrid.Columns>
+                        <dg:DataGridTextColumn Header="Наименование работ" Binding="{Binding WorkName}" Width="*"/>
+                        <dg:DataGridTextColumn Header="Затраты времени (час.)" Binding="{Binding TimeHours}" Width="160"/>
+                        <dg:DataGridTextColumn Header="Сроки исполнения" Binding="{Binding Deadline}" Width="200"/>
+                        <dg:DataGridTextColumn Header="Отметка об исполнении" Binding="{Binding CompletionNote}" Width="200"/>
+                      </dg:DataGrid.Columns>
+                    </dg:DataGrid>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Spacing="6"
+                                Margin="0,6,0,0">
+                      <Button Content="Добавить строку"
+                              Width="160"
+                              Click="AddExtracurricularRow_Click"/>
+                      <Button Content="Удалить строку"
+                              Width="160"
+                              IsEnabled="{Binding CanDeleteExtracurricularRow}"
+                              Click="DeleteExtracurricularRow_Click"/>
+                    </StackPanel>
+                  </StackPanel>
+                </Expander>
+
+                <Expander Header="Другие виды работ">
+                  <StackPanel Spacing="6" Margin="0,6,0,0">
+                    <dg:DataGrid ItemsSource="{Binding OtherWorkRows}"
+                                 AutoGenerateColumns="False"
+                                 IsReadOnly="False"
+                                 SelectedItem="{Binding SelectedOtherWorkRow}"
+                                 GridLinesVisibility="All"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 VerticalScrollBarVisibility="Auto"
+                                 RowHeight="26"
+                                 ColumnHeaderHeight="30">
+                      <dg:DataGrid.Columns>
+                        <dg:DataGridTextColumn Header="Наименование работ" Binding="{Binding WorkName}" Width="*"/>
+                        <dg:DataGridTextColumn Header="Затраты времени (час.)" Binding="{Binding TimeHours}" Width="160"/>
+                        <dg:DataGridTextColumn Header="Сроки исполнения" Binding="{Binding Deadline}" Width="200"/>
+                        <dg:DataGridTextColumn Header="Отметка об исполнении" Binding="{Binding CompletionNote}" Width="200"/>
+                      </dg:DataGrid.Columns>
+                    </dg:DataGrid>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Spacing="6"
+                                Margin="0,6,0,0">
+                      <Button Content="Добавить строку"
+                              Width="160"
+                              Click="AddOtherWorkRow_Click"/>
+                      <Button Content="Удалить строку"
+                              Width="160"
+                              IsEnabled="{Binding CanDeleteOtherWorkRow}"
+                              Click="DeleteOtherWorkRow_Click"/>
+                    </StackPanel>
+                  </StackPanel>
+                </Expander>
+
+              </StackPanel>
+            </ScrollViewer>
           </TabItem>
 
         </TabControl>
