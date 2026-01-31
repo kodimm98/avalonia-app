@@ -137,6 +137,18 @@ private void ToggleLeft_Click(object? sender, Avalonia.Interactivity.RoutedEvent
         window.Show(this);
     }
 
+    private void TeachingCellEditEnded(object? sender, Avalonia.Controls.DataGridCellEditEndedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.RecalculateTableTotals(vm.SelectedTable);
+    }
+
+    private void TableInclude_Checked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.RecalculateSummaryFromTables();
+    }
+
     private void AddMethodicalProcessRow_Click(object? sender, RoutedEventArgs e)
     {
         if (DataContext is MainWindowViewModel vm)

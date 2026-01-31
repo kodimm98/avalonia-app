@@ -125,7 +125,7 @@ public partial class MainWindowViewModel : ViewModelBase
         foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
             SummaryRows.Add(r);
 
-        ResetMethodicalRows();
+        EnsureMethodicalRows();
         await _repo.SaveAllAsync(imported, summary, BuildMethodicalFromUi());
 
         CurrentPlanId = null;
@@ -155,6 +155,9 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
+        EnsureMethodicalRows();
 
         LoadMethodical(methodical);
 
@@ -266,6 +269,8 @@ public partial class MainWindowViewModel : ViewModelBase
             foreach (var r in summary.Rows.OrderBy(r => r.RowOrder))
                 SummaryRows.Add(r);
         }
+
+        LoadMethodical(methodical);
 
         LoadMethodical(methodical);
 

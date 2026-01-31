@@ -145,6 +145,21 @@ public partial class MainWindowViewModel
         OtherWorkRows.Add(new MethodWorkRow { Category = OtherWorkCategory });
     }
 
+    private void EnsureMethodicalRows()
+    {
+        if (MethodicalProcessRows.Count == 0
+            && MethodicalPublishingRows.Count == 0
+            && MethodicalBaseRows.Count == 0
+            && OrganizationalResearchRows.Count == 0
+            && ResearchWorkRows.Count == 0
+            && QualificationRows.Count == 0
+            && ExtracurricularRows.Count == 0
+            && OtherWorkRows.Count == 0)
+        {
+            ResetMethodicalRows();
+        }
+    }
+
     private void LoadMethodical(MethodWorkTable? table)
     {
         MethodicalProcessRows.Clear();
@@ -253,8 +268,39 @@ public partial class MainWindowViewModel
     {
         var summary = BuildSummaryFromUi();
         ApplyMethodicalSummary(summary, BuildMethodicalFromUi());
-        return _summaryCalculator.CreateOrUpdate(summary, Tables.ToList());
+        var tablesToUse = Tables.Where(t => t.IncludeInSummary).ToList();
+        return _summaryCalculator.CreateOrUpdate(summary, tablesToUse);
     }
+
+    public void RecalculateSummaryFromTables()
+    {
+        var recalced = BuildRecalcedSummaryFromUi();
+        RefreshSummaryRows(recalced);
+    }
+
+    public void RecalculateTableTotals(PlanTable? table)
+    {
+        if (table == null) return;
+        RecalculateTotalsFromSummaryRows(table);
+        RecalculateSummaryFromTables();
+    }
+
+    private static void RecalculateTotalsFromSummaryRows(PlanTable table)
+    {
+        var summaryRows = table.Rows.Where(r => r.IsSummary).ToList();
+
+        table.Sem1Plan = FindTotal(summaryRows, "Итого за 1 семестр", "Поручено");
+        table.Sem1Fact = FindTotal(summaryRows, "Итого за 1 семестр", "Выполнено");
+        table.Sem2Plan = FindTotal(summaryRows, "Итого за 2 семестр", "Поручено");
+        table.Sem2Fact = FindTotal(summaryRows, "Итого за 2 семестр", "Выполнено");
+        table.YearPlan = FindTotal(summaryRows, "Итого за год", "Поручено");
+        table.YearFact = FindTotal(summaryRows, "Итого за год", "Выполнено");
+    }
+
+    private static int? FindTotal(IEnumerable<PlanRow> rows, string header, string kind)
+        => rows.FirstOrDefault(r => r.DisciplineName.StartsWith(header, StringComparison.OrdinalIgnoreCase)
+                                    && r.FacultyGroup.Equals(kind, StringComparison.OrdinalIgnoreCase))
+                ?.Total;
 
     private void RefreshSummaryRows(SummaryTable summary)
     {
